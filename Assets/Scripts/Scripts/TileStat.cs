@@ -10,14 +10,14 @@ public class TileStat : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-	//	manager = transform.parent.GameObject;
+		manager = transform.parent.gameObject;
 	}
 
 	// Update is called once per frame
 	void Update () {
 
 	}
-/*
+
 	public GameObject getNeighbor(char dir) {
 		switch(dir) {
 			case 'n':
@@ -31,5 +31,5 @@ public class TileStat : MonoBehaviour {
 			default:
 				return null;
 		}
-	}*/
+	}
 }
