@@ -14,11 +14,13 @@ public class GameState : MonoBehaviour {
 	public int mapWidth;
 
 	//game state vars
-	int globalTurn;
+	float timeTurner;
+	float turnLength;
 	public enum Turns {playerOne, gameOne, playerTwo, gameTwo};
 	public Turns currentTurn = Turns.playerOne;
+	int globalTurn;
 	public	char currentMove = ' ';
-	int turnSpeed;
+
 
 	Vector3 firstTile;
 	Vector3 secondTile;
@@ -27,8 +29,9 @@ public class GameState : MonoBehaviour {
 	public int tileScale;
 	int firstX;
 	int firstY;
-	int originX;
-	int originY;
+	int secondX;
+	int secondY;
+
 	Vector3 originTile;
 
 	// Use this for initialization
@@ -36,11 +39,11 @@ public class GameState : MonoBehaviour {
 		globalTurn = 0;
 		mapHeight = 40;
 		mapWidth = 40;
-		turnSpeed = 3;
 		tileScale = 1;
 
-		originX = 0;
-		originY = 0;
+		turnLength = 1.0f;
+		timeTurner = 0f;
+
 		originTile = Vector3.zero;
 
 		//quadrant p1 pick
@@ -62,13 +65,15 @@ public class GameState : MonoBehaviour {
 				firstY = (3 * mapWidth)/4;
 				break;
 		}
-		
+
 		firstX += Random.Range(-2, 2);
 		firstY += Random.Range(-2, 2);
 		firstTile = new Vector3(firstX, firstY, 0);
 		secondTile = firstTile;
 		while(secondTile == firstTile) {
-			secondTile = new Vector3(firstTile.y + Random.Range(-2, 2), firstTile.x + Random.Range(-2,2), 0);
+			secondX = Random.Range(-2, 2);
+			secondY = Random.Range(-2, 2);
+			secondTile = new Vector3(firstTile.x + secondX, firstTile.y + secondY, 0);
 		}
 
 		//generate map
@@ -82,14 +87,14 @@ public class GameState : MonoBehaviour {
 			}
 		}
 
-		playerOneStart = tiles[tiles[0,0].GetComponent<TileStat>().y, tiles[0,0].GetComponent<TileStat>().x];
+		playerOneStart = tiles[tiles[0,0].GetComponent<TileStat>().y + firstY, tiles[0,0].GetComponent<TileStat>().x + firstX];
 		playerOne = Instantiate(playerPrefab, new Vector3(firstTile.x, firstTile.y, 0), Quaternion.identity) as GameObject;
 		playerOne.GetComponent<Player>().setPlayerNum(1);
 		playerOne.GetComponent<Animus>().location = playerOneStart;
 		playerOneStart.GetComponent<TileStat>().occupied = true;
 		playerOne.transform.parent = this.transform;
 
-		playerTwoStart = tiles[tiles[0,0].GetComponent<TileStat>().y, tiles[0,0].GetComponent<TileStat>().x];
+		playerTwoStart = tiles[tiles[0,0].GetComponent<TileStat>().y + (firstY + secondY), tiles[0,0].GetComponent<TileStat>().x + (firstX + secondX)];
 		playerTwo = Instantiate(playerPrefab, new Vector3(secondTile.x, secondTile.y, 0), Quaternion.identity) as GameObject;
 		playerTwo.GetComponent<Player>().setPlayerNum(2);
 		playerTwo.GetComponent<Animus>().location = playerTwoStart;
@@ -99,58 +104,48 @@ public class GameState : MonoBehaviour {
 
 	void Start () {
 		currentTurn = Turns.playerOne;
-		StartCoroutine ( iterateTurns() );
+		turnGUI.GetComponent<Text>().text = "p1";
+		playerOne.GetComponent<Player>().fatigued = false;
+		timeTurner = turnLength;
+
+		Debug.Log(playerOne.GetComponent<Animus>().location);
 	}
 
 	void Update () {
-	}
-	
-	IEnumerator iterateTurns() {
-		switch(currentTurn) {
-		case Turns.playerOne:
-			turnGUI.GetComponent<Text>().text = "Turn: Game 1";
-			break;
-		case Turns.playerTwo:
-			turnGUI.GetComponent<Text>().text = "Turn: Game 2";
-			break;
-		case Turns.gameOne:
-			//monster 1's move calc
-			turnGUI.GetComponent<Text>().text = "Turn: Player 1";
-			break;
-		case Turns.gameTwo:
-			//monster 2's move calc
-			turnGUI.GetComponent<Text>().text = "Turn: Player 2";
-			break;
+		timeTurner = timeTurner - Time.deltaTime;
+		if (timeTurner <= 0) {
+			iterateTurns();
+			timeTurner = turnLength;
 		}
-		
-		yield return new WaitForSeconds(turnSpeed);
-		
+	}
+
+	void iterateTurns() {
 		switch(currentTurn) {
 		case Turns.playerOne:
-			turnGUI.GetComponent<Text>().text = "Turn: Game 1";
+			turnGUI.GetComponent<Text>().text = "g1";
 			currentTurn = Turns.gameOne;
 			break;
 		case Turns.playerTwo:
-			turnGUI.GetComponent<Text>().text = "Turn: Game 2";
+			turnGUI.GetComponent<Text>().text = "g2";
 			currentTurn = Turns.gameTwo;
 			break;
 		case Turns.gameOne:
 			//monster 1's move calc
-			turnGUI.GetComponent<Text>().text = "Turn: Player 1";
-			playerOne.GetComponent<Player>().fatigued = false;
+			turnGUI.GetComponent<Text>().text = "p2";
+			playerTwo.GetComponent<Player>().fatigued = false;
 			currentTurn = Turns.playerTwo;
 			break;
 		case Turns.gameTwo:
 			//monster 2's move calc
-			turnGUI.GetComponent<Text>().text = "Turn: Player 2";
-			playerTwo.GetComponent<Player>().fatigued = false;
+			turnGUI.GetComponent<Text>().text = "p1";
+			playerOne.GetComponent<Player>().fatigued = false;
 			currentTurn = Turns.playerOne;
 			break;
 		}
 	}
 
 	public void move(GameObject piece, char dir) {
-		
+
 		GameObject goalTile = piece.GetComponent<Animus>().location;
 		int goalX = piece.GetComponent<Animus>().location.GetComponent<TileStat>().x;
 		int goalY = piece.GetComponent<Animus>().location.GetComponent<TileStat>().y;
@@ -187,11 +182,12 @@ public class GameState : MonoBehaviour {
 		piece.transform.position = goalTile.transform.position;
 		piece.GetComponent<Animus>().location = goalTile;
 		goalTile.GetComponent<TileStat>().occupied = true;
+
+		stopTurn();
 	}
-	
-	public void stopTurn(GameState.Turns nextTurn) {
-		StopCoroutine( iterateTurns() );
-		currentTurn = nextTurn;
-		StartCoroutine( iterateTurns() );
+
+	public void stopTurn() {
+		timeTurner = turnLength;
+		iterateTurns();
 	}
 }
