@@ -2,41 +2,56 @@
 using System.Collections;
 
 public class Player : MonoBehaviour {
-
+	
+	
+	
 	public int playerSpeed;
+	public bool fatigued = true;
 	GameObject manager;
 	char currentTurn;
 	int playerNumber;
 
 	// Use this for initialization
-	void Start (int num) {
-		playerNumber = num;
+	void Start () {
 		manager = transform.parent.gameObject;
-		currentGameMove = manager.GetComponent<GameState>().currentMove;
 	}
 
 	// Update is called once per frame
 	void Update () {
-		if(playerNumber == 1 && manager.GetComponent<GameState>().currentTurn == Turns.playerOne) {
+		if(!fatigued && playerNumber == 1 && manager.GetComponent<GameState>().currentTurn == GameState.Turns.playerOne) {
+			
 			if(Input.GetKeyDown(KeyCode.W)) {
-				this.SendMessageUpwards("move", this, 'n');
+				manager.GetComponent<GameState>().move(this.gameObject, 'n');
+				manager.GetComponent<GameState>().stopTurn(GameState.Turns.gameOne);
 			} else if (Input.GetKeyDown(KeyCode.A)) {
-				this.SendMessageUpwards("move", this, 'w');
+				manager.GetComponent<GameState>().move(this.gameObject, 'w');
+				manager.GetComponent<GameState>().stopTurn(GameState.Turns.gameOne);
 			} else if (Input.GetKeyDown(KeyCode.S)) {
-				this.SendMessageUpwards("move", this, 's');
+				manager.GetComponent<GameState>().move(this.gameObject, 's');
+				manager.GetComponent<GameState>().stopTurn(GameState.Turns.gameOne);
 			} else if (Input.GetKeyDown(KeyCode.D)) {
-				this.SendMessageUpwards("move", this, 'e');
+				manager.GetComponent<GameState>().move(this.gameObject, 'e');
+				manager.GetComponent<GameState>().stopTurn(GameState.Turns.gameOne);
 			}
-		} else if(playerNumber == 2 && manager.GetComponent<GameState>().currentTurn == Turns.playerTwo) {
+		} else if(!fatigued && playerNumber == 2 && manager.GetComponent<GameState>().currentTurn == GameState.Turns.playerTwo) {
 			if(Input.GetKeyDown(KeyCode.Y)) {
-				this.SendMessageUpwards("move", this, 'n');
+				manager.GetComponent<GameState>().move(this.gameObject, 'n');
+				manager.GetComponent<GameState>().stopTurn(GameState.Turns.gameTwo);
 			} else if (Input.GetKeyDown(KeyCode.G)) {
-				this.SendMessageUpwards("move", this, 'w');
+				manager.GetComponent<GameState>().move(this.gameObject, 'w');
+				manager.GetComponent<GameState>().stopTurn(GameState.Turns.gameTwo);
 			} else if (Input.GetKeyDown(KeyCode.H)) {
-				this.SendMessageUpwards("move", this, 's');
+				manager.GetComponent<GameState>().move(this.gameObject, 's');
+				manager.GetComponent<GameState>().stopTurn(GameState.Turns.gameTwo);
 			} else if (Input.GetKeyDown(KeyCode.J)) {
-				this.SendMessageUpwards("move", this, 'e');
+				manager.GetComponent<GameState>().move(this.gameObject, 'e');
+				manager.GetComponent<GameState>().stopTurn(GameState.Turns.gameTwo);
 			}
 		}
 	}
+	
+	public void setPlayerNum(int pNum) {
+		playerNumber = pNum;
+	}
+	
 }
