@@ -3,16 +3,22 @@ using System.Collections;
 
 public class Player : MonoBehaviour {
 
-	public int playerSpeed;
-	public bool fatigued = true;
+	public GameObject segmentPrefab;
 	GameObject manager;
-	char currentTurn;
+	GameObject segmentHolder;
+	Transform segmentTraversal;
+	public int length;
 	int playerNumber;
 	int x;
 	int y;
+	char currentTurn;
+	public int playerSpeed;
+	public bool fatigued = true;
+
 	// Use this for initialization
 	void Start () {
 		manager = transform.parent.gameObject;
+		length = 1;
 	}
 
 	// Update is called once per frame
@@ -45,5 +51,19 @@ public class Player : MonoBehaviour {
 		playerNumber = pNum;
 	}
 
+	//tile is location new segment appears
+	public void grow(GameObject tile) {
+			segmentHolder = Instantiate(segmentPrefab, tile.transform.position, Quaternion.identity) as GameObject;
+			segmentTraversal = this.gameObject.transform;
 
+		if(length == 1) {
+		} else {
+			for(int i = 1; i < length; i++) {
+				segmentTraversal = segmentTraversal.GetChild(0);
+			}
+		}
+
+		segmentHolder.transform.parent = segmentTraversal;
+		length++;
+	}
 }

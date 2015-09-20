@@ -4,26 +4,28 @@ using System.Collections;
 public class TileStat : MonoBehaviour {
 
 	GameObject manager;
+	public GameObject occupant;
 	Color color;
-	public float absoluteLight;
-	public float actualLight;
 	public int x;
 	public int y;
+<<<<<<< HEAD
 	public bool occupied = false; 
+=======
+	public bool occupied = false;
+	public bool lightUpdated;
+>>>>>>> c04fa4d82ecee29c1f1d559567b245b1f08b80bf
 
 	// Use this for initialization
 	void Start () {
 		manager = transform.parent.gameObject;
 		color = this.gameObject.transform.GetChild(1).GetComponent<Renderer>().material.color;
- 		color.a = 0f;
+ 		color.a = 255f;
 		this.gameObject.GetComponent<Renderer>().material.SetColor("_Color", color);
-		absoluteLight = 0;
-		actualLight = 0;
 	}
 
 	// Update is called once per frame
 	void Update () {
-
+		this.gameObject.transform.GetChild(1).GetComponent<Renderer>().material.SetColor("_Color", color);
 	}
 
 	public GameObject getNeighbor(char dir) {
@@ -43,12 +45,22 @@ public class TileStat : MonoBehaviour {
 
 	public void updateLight(int yDisplacement, int xDisplacement) {
 
-		absoluteLight = absoluteLight - (yDisplacement * (manager.GetComponent<GameState>().lightRange * manager.GetComponent<GameState>().lightIntensity));
-		absoluteLight = absoluteLight - (xDisplacement * (manager.GetComponent<GameState>().lightRange * manager.GetComponent<GameState>().lightIntensity));
+	color.a = Mathf.Lerp(color.a, 0f, 200f);
 
-		color = this.gameObject.transform.GetChild(1).GetComponent<Renderer>().material.color;
-		color.a = Mathf.Lerp(actualLight, absoluteLight, 5 * Time.deltaTime);
+	this.gameObject.transform.GetChild(1).GetComponent<Renderer>().material.SetColor("_Color", color);
+	}
 
-		this.gameObject.transform.GetChild(1).GetComponent<Renderer>().material.SetColor("_Color", color);
+	public void updateLight() {
+
+	color.a = Mathf.Lerp(color.a, 0f, 4f * Time.deltaTime);
+
+	this.gameObject.transform.GetChild(1).GetComponent<Renderer>().material.SetColor("_Color", color);
+	}
+
+	public void deprecateLight() {
+
+	color.a = Mathf.Lerp(color.a, 255f, .001f * Time.deltaTime);
+
+	this.gameObject.transform.GetChild(1).GetComponent<Renderer>().material.SetColor("_Color", color);
 	}
 }
