@@ -12,6 +12,12 @@ public class GameState : MonoBehaviour {
 	public GameObject turnGUI;
 	public int mapHeight;
 	public int mapWidth;
+	public int lightRange;
+	public int lightIntensity;
+	int lightDeviation;
+	int dx;
+	int playerY, playerX;
+
 
 	//game state vars
 	float timeTurner;
@@ -40,6 +46,8 @@ public class GameState : MonoBehaviour {
 		mapHeight = 40;
 		mapWidth = 40;
 		tileScale = 1;
+		lightRange = 10;
+		lightIntensity = 5;
 
 		turnLength = 1.0f;
 		timeTurner = 0f;
@@ -90,6 +98,7 @@ public class GameState : MonoBehaviour {
 		playerOneStart = tiles[tiles[0,0].GetComponent<TileStat>().y + firstY, tiles[0,0].GetComponent<TileStat>().x + firstX];
 		playerOne = Instantiate(playerPrefab, new Vector3(firstTile.x, firstTile.y, 0), Quaternion.identity) as GameObject;
 		playerOne.GetComponent<Player>().setPlayerNum(1);
+		playerOne.GetComponent<Animus>().setCoords(playerOneStart.GetComponent<TileStat>().x, playerOneStart.GetComponent<TileStat>().y);
 		playerOne.GetComponent<Animus>().location = playerOneStart;
 		playerOneStart.GetComponent<TileStat>().occupied = true;
 		playerOne.transform.parent = this.transform;
@@ -97,6 +106,7 @@ public class GameState : MonoBehaviour {
 		playerTwoStart = tiles[tiles[0,0].GetComponent<TileStat>().y + (firstY + secondY), tiles[0,0].GetComponent<TileStat>().x + (firstX + secondX)];
 		playerTwo = Instantiate(playerPrefab, new Vector3(secondTile.x, secondTile.y, 0), Quaternion.identity) as GameObject;
 		playerTwo.GetComponent<Player>().setPlayerNum(2);
+		playerOne.GetComponent<Animus>().setCoords(playerTwoStart.GetComponent<TileStat>().x, playerTwoStart.GetComponent<TileStat>().y);
 		playerTwo.GetComponent<Animus>().location = playerTwoStart;
 		playerTwoStart.GetComponent<TileStat>().occupied = true;
 		playerTwo.transform.parent = this.transform;
@@ -107,8 +117,6 @@ public class GameState : MonoBehaviour {
 		turnGUI.GetComponent<Text>().text = "p1";
 		playerOne.GetComponent<Player>().fatigued = false;
 		timeTurner = turnLength;
-
-		Debug.Log(playerOne.GetComponent<Animus>().location);
 	}
 
 	void Update () {
@@ -116,6 +124,35 @@ public class GameState : MonoBehaviour {
 		if (timeTurner <= 0) {
 			iterateTurns();
 			timeTurner = turnLength;
+		}
+
+		//call on tiles within range of players; top
+		for(int i = lightRange; i >= 0; i --) {
+			for(dx = -1 * (Mathf.Abs(i - lightRange)); dx < Mathf.Abs(i - lightRange); dx++ ) {
+
+				if(isInGrid(playerOne.GetComponent<Animus>().y - i, playerOne.GetComponent<Animus>().x + dx)) {
+					tiles[playerOne.GetComponent<Animus>().y - i, playerOne.GetComponent<Animus>().x + dx].GetComponent<TileStat>().updateLight(i, dx);
+
+				}
+
+				if(isInGrid(playerTwo.GetComponent<Animus>().y - i, playerTwo.GetComponent<Animus>().x + dx)) {
+					tiles[playerTwo.GetComponent<Animus>().y - i, playerTwo.GetComponent<Animus>().x + dx].GetComponent<TileStat>().updateLight(i, dx);
+				}
+			}
+		}
+
+		//bottom
+		for(int i = 0 - lightRange; i < 0; i++) {
+			for(dx = -1 * (Mathf.Abs(i + lightRange)); dx < Mathf.Abs(i + lightRange); dx++ ) {
+				if(isInGrid(playerOne.GetComponent<Animus>().y - i, playerOne.GetComponent<Animus>().x + dx)) {
+					tiles[playerOne.GetComponent<Animus>().y - i, playerOne.GetComponent<Animus>().x + dx].GetComponent<TileStat>().updateLight(i, dx);
+
+				}
+
+				if(isInGrid(playerTwo.GetComponent<Animus>().y - i, playerTwo.GetComponent<Animus>().x + dx)) {
+					tiles[playerTwo.GetComponent<Animus>().y - i, playerTwo.GetComponent<Animus>().x + dx].GetComponent<TileStat>().updateLight(i, dx);
+				}
+			}
 		}
 	}
 
@@ -181,6 +218,7 @@ public class GameState : MonoBehaviour {
 
 		piece.transform.position = goalTile.transform.position;
 		piece.GetComponent<Animus>().location = goalTile;
+		piece.GetComponent<Animus>().setCoords(goalTile.GetComponent<TileStat>().x, goalTile.GetComponent<TileStat>().y);
 		goalTile.GetComponent<TileStat>().occupied = true;
 
 		stopTurn();
@@ -190,4 +228,17 @@ public class GameState : MonoBehaviour {
 		timeTurner = turnLength;
 		iterateTurns();
 	}
+
+	public int tileDistance(GameObject startTile, GameObject targetTile) {
+
+		return (int) Mathf.Sqrt( (float) (Mathf.Pow((targetTile.GetComponent<TileStat>().x - startTile.GetComponent<TileStat>().x), 2) + Mathf.Sqrt(Mathf.Pow((targetTile.GetComponent<TileStat>().y - startTile.GetComponent<TileStat>().y), 2f))));
+	}
+
+	bool isInGrid(int y, int x) {
+	if(y > 0 && y < mapHeight && x > 0 && x < mapWidth) {
+		return true;
+	} else {
+		return false;
+	}
+}
 }

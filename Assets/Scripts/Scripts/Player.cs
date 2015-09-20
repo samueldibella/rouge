@@ -3,14 +3,13 @@ using System.Collections;
 
 public class Player : MonoBehaviour {
 
-
-
 	public int playerSpeed;
 	public bool fatigued = true;
 	GameObject manager;
 	char currentTurn;
 	int playerNumber;
-
+	int x;
+	int y;
 	// Use this for initialization
 	void Start () {
 		manager = transform.parent.gameObject;
@@ -45,5 +44,6 @@ public class Player : MonoBehaviour {
 	public void setPlayerNum(int pNum) {
 		playerNumber = pNum;
 	}
+
 
 }
