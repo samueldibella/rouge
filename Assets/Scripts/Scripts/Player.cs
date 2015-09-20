@@ -7,7 +7,7 @@ public class Player : MonoBehaviour {
 	GameObject manager;
 	GameObject segmentHolder;
 	Transform segmentTraversal;
-	int length;
+	public int length;
 	int playerNumber;
 	int x;
 	int y;

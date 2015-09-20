@@ -221,10 +221,10 @@ public class GameState : MonoBehaviour {
 				segmentTraversal.gameObject.GetComponent<Animus>().location.GetComponent<TileStat>().occupied = false;
 				segmentTraversal.gameObject.GetComponent<Animus>().location.GetComponent<TileStat>().occupant = null;
 
-				for(int i = piece.GetComponent<Player>().length; i--) {
+				for(int i = piece.GetComponent<Player>().length; i > 1; i--) {
 					segmentTraversal.gameObject.transform.position = segmentTraversal.parent.transform.position;
 					segmentTraversal.gameObject.GetComponent<Animus>().location = segmentTraversal.parent.transform.gameObject.GetComponent<Animus>().location;
-					segmentTraversal.gameObject.GetComponent<Animus>().setCoords(	segmentTraversal.gameObject.GetComponent<Animus>().location.GetComponent<TileStat>().x, 	segmentTraversal.gameObject.GetComponent<Animus>().location.GetComponent<TileStat>().y);
+					segmentTraversal.gameObject.GetComponent<Animus>().setCoords(	segmentTraversal.gameObject.GetComponent<Animus>().location.GetComponent<TileStat>().x,	segmentTraversal.gameObject.GetComponent<Animus>().location.GetComponent<TileStat>().y);
 					segmentTraversal.gameObject.GetComponent<Animus>().location.GetComponent<TileStat>().occupied = true;
 					segmentTraversal.gameObject.GetComponent<Animus>().location.GetComponent<TileStat>().occupant = piece;
 
@@ -232,7 +232,7 @@ public class GameState : MonoBehaviour {
 				}
 
 
-				piece.transform.position = newTile.transform.position;
+				piece.transform.position = goalTile.transform.position;
 				piece.GetComponent<Animus>().location = goalTile;
 				piece.GetComponent<Animus>().setCoords(goalTile.GetComponent<TileStat>().x, goalTile.GetComponent<TileStat>().y);
 				goalTile.GetComponent<TileStat>().occupied = true;
