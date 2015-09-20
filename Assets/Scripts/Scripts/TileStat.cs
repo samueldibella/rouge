@@ -8,12 +8,8 @@ public class TileStat : MonoBehaviour {
 	Color color;
 	public int x;
 	public int y;
-<<<<<<< HEAD
-	public bool occupied = false; 
-=======
 	public bool occupied = false;
 	public bool lightUpdated;
->>>>>>> c04fa4d82ecee29c1f1d559567b245b1f08b80bf
 
 	// Use this for initialization
 	void Start () {

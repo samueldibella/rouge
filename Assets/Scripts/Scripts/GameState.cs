@@ -19,12 +19,8 @@ public class GameState : MonoBehaviour {
 	public int lightRange;
 	public int lightIntensity;
 	int lightDeviation;
-<<<<<<< HEAD
-	int dx;
 	int playerY, playerX;
-=======
 	int dx, dy;
->>>>>>> c04fa4d82ecee29c1f1d559567b245b1f08b80bf
 
 	//game state vars
 	float timeTurner;
