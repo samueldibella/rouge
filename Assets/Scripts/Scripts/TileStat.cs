@@ -9,7 +9,7 @@ public class TileStat : MonoBehaviour {
 	public float actualLight;
 	public int x;
 	public int y;
-	public bool occupied = false;
+	public bool occupied = false; 
 
 	// Use this for initialization
 	void Start () {
