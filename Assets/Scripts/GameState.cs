@@ -5,8 +5,9 @@ using UnityEngine.UI;
 public class GameState : MonoBehaviour {
 
 	public GameObject tilePrefab;
-	public GameObject playerPrefab;
+	public GameObject tileTestWallPrefab;
 	public GameObject enemyPrefab;
+	public GameObject playerPrefab;
 	public GameObject playerOne;
 	public GameObject playerTwo;
 	public GameObject[,] tiles;
@@ -16,6 +17,7 @@ public class GameState : MonoBehaviour {
 	public int lightRange;
 	public int lightIntensity;
 	int lightDeviation;
+	int playerY, playerX;
 	int dx, dy;
 
 	//game state vars
@@ -47,49 +49,55 @@ public class GameState : MonoBehaviour {
 
 		originTile = Vector3.zero;
 
-		//quadrant p1 pick
-		switch(Random.Range(0,4)) {
-			case 0:
-				firstX = (3 * mapWidth)/4;
-				firstY = mapWidth/4;
-				break;
-			case 1:
-				firstX = mapWidth/4;
-				firstY = mapWidth/4;
-				break;
-			case 2:
-				firstX = mapWidth/4;
-				firstY = (3 * mapWidth)/4;
-				break;
-			case 3:
-				firstX = (3 * mapWidth)/4;
-				firstY = (3 * mapWidth)/4;
-				break;
-		}
-
-		firstX += Random.Range(-2, 2);
-		firstY += Random.Range(-2, 2);
-		firstTile = new Vector3(firstX, firstY, 0);
-		secondTile = firstTile;
-		while(secondTile == firstTile) {
-			secondX = Random.Range(-2, 2);
-			secondY = Random.Range(-2, 2);
-			secondTile = new Vector3(firstTile.x + secondX, firstTile.y + secondY, 0);
-		}
 
 		//generate map
-		tiles = new GameObject[mapHeight, mapWidth];
-		for(int j = 0; j < mapHeight; j++) {
-			for(int i = 0; i < mapWidth; i++) {
-				tiles[j, i] = Instantiate(tilePrefab, new Vector3(originTile.x + (i * tileScale), originTile.y + (j * tileScale), firstTile.z), Quaternion.identity) as GameObject;
-				tiles[j, i].transform.parent = this.transform;
-				tiles[j, i].GetComponent<TileStat>().x = i;
-				tiles[j, i].GetComponent<TileStat>().y = j;
+		this.GetComponent<Generation>().GenerateMap();  
+		tiles = new GameObject[Generation.Width, Generation.Height];
+		//print map
+		for(int j = 0; j < Generation.Height; j++) {
+			for(int i = 0; i < Generation.Width; i++) {
+				if ((int)Generation.Map [j, i] == 1) { 
+					tiles[j, i] = Instantiate(tilePrefab, new Vector3(originTile.x + (i * tileScale), originTile.y + (j * tileScale), 0), Quaternion.identity) as GameObject;
+					tiles[j, i].transform.parent = this.transform;
+					tiles[j, i].GetComponent<TileStat>().x = i;
+					tiles[j, i].GetComponent<TileStat>().y = j;
+				} else if ((int)Generation.Map[j, i] == 4) { 
+					tiles[j, i] = Instantiate(tileTestWallPrefab, new Vector3(originTile.x + (i * tileScale), originTile.y + (j * tileScale), 0), Quaternion.identity) as GameObject;
+					tiles[j, i].transform.parent = this.transform;
+					tiles[j, i].GetComponent<TileStat>().x = i;
+					tiles[j, i].GetComponent<TileStat>().y = j;
+				} else if ((int)Generation.Map [j, i] == 20) { 
+					tiles[j, i] = Instantiate(tileTestWallPrefab, new Vector3(originTile.x + (i * tileScale), originTile.y + (j * tileScale), 0), Quaternion.identity) as GameObject;
+					tiles[j, i].transform.parent = this.transform;
+					tiles[j, i].GetComponent<TileStat>().x = i;
+					tiles[j, i].GetComponent<TileStat>().y = j;
+				} else if ((int)Generation.Map [j, i] == 50)  { //enemy
+					//player 1 start
+					tiles[j, i] = Instantiate(tilePrefab, new Vector3(originTile.x + (i * tileScale), originTile.y + (j * tileScale), 0), Quaternion.identity) as GameObject;
+					Instantiate(enemyPrefab, new Vector3(originTile.x + (i * tileScale), originTile.y + (j * tileScale), 0), Quaternion.identity);
+					tiles[j, i].transform.parent = this.transform;
+					tiles[j, i].GetComponent<TileStat>().x = i;
+					tiles[j, i].GetComponent<TileStat>().y = j; 
+					tiles[j, i].GetComponent<TileStat>().occupied = true; 
+				} else if ((int)Generation.Map [j, i] == 100)  { //player 1 start
+					//player 1 start
+					tiles[j, i] = Instantiate(tilePrefab, new Vector3(originTile.x + (i * tileScale), originTile.y + (j * tileScale), 0), Quaternion.identity) as GameObject;
+					playerOneStart = tiles[j, i];
+					tiles[j, i].transform.parent = this.transform;
+					tiles[j, i].GetComponent<TileStat>().x = i;
+					tiles[j, i].GetComponent<TileStat>().y = j; 
+				} else if ((int)Generation.Map [j, i] == 200) { 
+					tiles[j, i] = Instantiate(tilePrefab, new Vector3(originTile.x + (i * tileScale), originTile.y + (j * tileScale), 0), Quaternion.identity) as GameObject;
+					playerTwoStart = tiles[j, i];
+					tiles[j, i].transform.parent = this.transform;
+					tiles[j, i].GetComponent<TileStat>().x = i;
+					tiles[j, i].GetComponent<TileStat>().y = j;
+				}
 			}
 		}
 
-		playerOneStart = tiles[tiles[0,0].GetComponent<TileStat>().y + firstY, tiles[0,0].GetComponent<TileStat>().x + firstX];
-		playerOne = Instantiate(playerPrefab, new Vector3(firstTile.x, firstTile.y, 0), Quaternion.identity) as GameObject;
+		//tell player where they start
+		playerOne = Instantiate(playerPrefab, new Vector3(playerOneStart.transform.position.x, playerOneStart.transform.position.y, 0), Quaternion.identity) as GameObject;
 		playerOne.GetComponent<Player>().setPlayerNum(1);
 		playerOne.GetComponent<Animus>().setCoords(playerOneStart.GetComponent<TileStat>().x, playerOneStart.GetComponent<TileStat>().y);
 		playerOne.GetComponent<Animus>().location = playerOneStart;
@@ -98,10 +106,10 @@ public class GameState : MonoBehaviour {
 		playerOne.transform.parent = this.transform;
 		playerOne.gameObject.transform.GetChild(1).GetComponent<Renderer>().material.color = Color.black;
 
-		playerTwoStart = tiles[tiles[0,0].GetComponent<TileStat>().y + (firstY + secondY), tiles[0,0].GetComponent<TileStat>().x + (firstX + secondX)];
-		playerTwo = Instantiate(playerPrefab, new Vector3(secondTile.x, secondTile.y, 0), Quaternion.identity) as GameObject;
+		//player2
+		playerTwo = Instantiate(playerPrefab, new Vector3(playerTwoStart.transform.position.x, playerTwoStart.transform.position.y, 0), Quaternion.identity) as GameObject;
 		playerTwo.GetComponent<Player>().setPlayerNum(2);
-		playerOne.GetComponent<Animus>().setCoords(playerTwoStart.GetComponent<TileStat>().x, playerTwoStart.GetComponent<TileStat>().y);
+		playerTwo.GetComponent<Animus>().setCoords(playerTwoStart.GetComponent<TileStat>().x, playerTwoStart.GetComponent<TileStat>().y);
 		playerTwo.GetComponent<Animus>().location = playerTwoStart;
 		playerTwo.GetComponent<Animus>().x = firstX + secondX;
 		playerTwo.GetComponent<Animus>().y = firstY + secondY;
