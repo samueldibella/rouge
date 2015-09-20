@@ -4,6 +4,7 @@ using System.Collections;
 public class TileStat : MonoBehaviour {
 
 	GameObject manager;
+	public GameObject occupant;
 	Color color;
 	public int x;
 	public int y;
