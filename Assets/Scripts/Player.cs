@@ -13,7 +13,6 @@ public class Player : MonoBehaviour {
 	int y;
 	char currentTurn;
 	public int playerSpeed;
-	public bool fatigued = true;
 
 	// Use this for initialization
 	void Start () {
@@ -23,28 +22,31 @@ public class Player : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-		if(!fatigued && playerNumber == 1 && manager.GetComponent<GameState>().currentTurn == GameState.Turns.playerOne) {
-
+		switch(playerNumber) {
+			case 1:
 			if(Input.GetKeyDown(KeyCode.W)) {
-				manager.GetComponent<GameState>().move(this.gameObject, 'n');
+				this.GetComponent<Animus>().dir = 'n';
 			} else if (Input.GetKeyDown(KeyCode.A)) {
-				manager.GetComponent<GameState>().move(this.gameObject, 'w');
+				this.GetComponent<Animus>().dir = 'w';
 			} else if (Input.GetKeyDown(KeyCode.S)) {
-				manager.GetComponent<GameState>().move(this.gameObject, 's');
+				this.GetComponent<Animus>().dir = 's';
 			} else if (Input.GetKeyDown(KeyCode.D)) {
-				manager.GetComponent<GameState>().move(this.gameObject, 'e');
+				this.GetComponent<Animus>().dir = 'e';
 			}
-		} else if(!fatigued && playerNumber == 2 && manager.GetComponent<GameState>().currentTurn == GameState.Turns.playerTwo) {
-			if(Input.GetKeyDown(KeyCode.Y)) {
-				manager.GetComponent<GameState>().move(this.gameObject, 'n');
-			} else if (Input.GetKeyDown(KeyCode.G)) {
-				manager.GetComponent<GameState>().move(this.gameObject, 'w');
-			} else if (Input.GetKeyDown(KeyCode.H)) {
-				manager.GetComponent<GameState>().move(this.gameObject, 's');
+				break;
+			case 2:
+			if(Input.GetKeyDown(KeyCode.I)) {
+				this.GetComponent<Animus>().dir = 'n';
 			} else if (Input.GetKeyDown(KeyCode.J)) {
-				manager.GetComponent<GameState>().move(this.gameObject, 'e');
+				this.GetComponent<Animus>().dir = 'w';
+			} else if (Input.GetKeyDown(KeyCode.K)) {
+				this.GetComponent<Animus>().dir = 's';
+			} else if (Input.GetKeyDown(KeyCode.L)) {
+				this.GetComponent<Animus>().dir = 'e';
 			}
+				break;
 		}
+
 	}
 
 	public void setPlayerNum(int pNum) {

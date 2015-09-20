@@ -3,6 +3,7 @@ using System.Collections;
 
 public class Animus : MonoBehaviour {
   	public GameObject location;
+    public char dir;
     public int x;
     public int y;
 	// Use this for initialization

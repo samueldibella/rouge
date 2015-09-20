@@ -46,17 +46,16 @@ public class TileStat : MonoBehaviour {
 	this.gameObject.transform.GetChild(1).GetComponent<Renderer>().material.SetColor("_Color", color);
 	}
 
-	public void updateLight() {
+	public void updateLight(float dx, float dy) {
 
-	color.a = Mathf.Lerp(color.a, 0f, 4f * Time.deltaTime);
+	color.a = Mathf.Lerp(color.a, 10, .0001f * Time.deltaTime);
 
 	this.gameObject.transform.GetChild(1).GetComponent<Renderer>().material.SetColor("_Color", color);
 	}
 
 	public void deprecateLight() {
+		color.a = Mathf.Lerp(color.a, 255f, .05f * Time.deltaTime);
 
-	color.a = Mathf.Lerp(color.a, 255f, .001f * Time.deltaTime);
-
-	this.gameObject.transform.GetChild(1).GetComponent<Renderer>().material.SetColor("_Color", color);
+		this.gameObject.transform.GetChild(1).GetComponent<Renderer>().material.color = color;
 	}
 }

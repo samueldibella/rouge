@@ -19,11 +19,7 @@ public class GameState : MonoBehaviour {
 	int dx, dy;
 
 	//game state vars
-	float timeTurner;
 	float turnLength;
-	public enum Turns {playerOne, gameOne, playerTwo, gameTwo};
-	public Turns currentTurn = Turns.playerOne;
-	int globalTurn;
 	public	char currentMove = ' ';
 
 
@@ -41,15 +37,13 @@ public class GameState : MonoBehaviour {
 
 	// Use this for initialization
 	void Awake () {
-		globalTurn = 0;
 		mapHeight = 40;
 		mapWidth = 40;
 		tileScale = 1;
-		lightRange = 7;
+		lightRange = 8;
 		lightIntensity = 5;
 
-		turnLength = 1.0f;
-		timeTurner = 0f;
+		turnLength = .1f;
 
 		originTile = Vector3.zero;
 
@@ -109,24 +103,18 @@ public class GameState : MonoBehaviour {
 		playerTwo.GetComponent<Player>().setPlayerNum(2);
 		playerOne.GetComponent<Animus>().setCoords(playerTwoStart.GetComponent<TileStat>().x, playerTwoStart.GetComponent<TileStat>().y);
 		playerTwo.GetComponent<Animus>().location = playerTwoStart;
+		playerTwo.GetComponent<Animus>().x = firstX + secondX;
+		playerTwo.GetComponent<Animus>().y = firstY + secondY;
 		playerTwoStart.GetComponent<TileStat>().occupied = true;
-		playerTwoStart.GetComponent<TileStat>().occupant = playerOne;
+		playerTwoStart.GetComponent<TileStat>().occupant = playerTwo;
 		playerTwo.transform.parent = this.transform;
 	}
 
 	void Start () {
-		currentTurn = Turns.playerOne;
-		turnGUI.GetComponent<Text>().text = "p1";
-		playerOne.GetComponent<Player>().fatigued = false;
-		timeTurner = turnLength;
+		StartCoroutine( Turns() );
 	}
 
 	void Update () {
-		timeTurner = timeTurner - Time.deltaTime;
-		if (timeTurner <= 0) {
-			iterateTurns();
-			timeTurner = turnLength;
-		}
 
 		for ( int y = playerOne.GetComponent<Animus>().y - lightRange; y < playerOne.GetComponent<Animus>().y + lightRange; y++) {
 			dy = y -  playerOne.GetComponent<Animus>().y;
@@ -134,7 +122,7 @@ public class GameState : MonoBehaviour {
 
 			for( int x = playerOne.GetComponent<Animus>().x - dx; x < playerOne.GetComponent<Animus>().x + dx; x++) {
 				if(isInGrid(x,y)) {
-					tiles[y,x].GetComponent<TileStat>().updateLight();
+					tiles[y,x].GetComponent<TileStat>().updateLight(Mathf.Abs(x), Mathf.Abs(y));
 					tiles[y,x].GetComponent<TileStat>().lightUpdated = true;
 				}
 			}
@@ -145,8 +133,8 @@ public class GameState : MonoBehaviour {
 			dx = (int) Mathf.Sqrt(lightRange * lightRange - dy * dy );
 
 			for( int x = playerTwo.GetComponent<Animus>().x - dx; x < playerTwo.GetComponent<Animus>().x + dx; x++) {
-				if(isInGrid(x,y)) {
-					tiles[y,x].GetComponent<TileStat>().updateLight();
+				if(isInGrid(x,y) && !(y == 0 && (x == playerTwo.GetComponent<Animus>().x - dx || x ==  playerTwo.GetComponent<Animus>().x + dx))) {
+					tiles[y,x].GetComponent<TileStat>().updateLight(Mathf.Abs(x), Mathf.Abs(y));
 					tiles[y,x].GetComponent<TileStat>().lightUpdated = true;
 				}
 			}
@@ -154,7 +142,7 @@ public class GameState : MonoBehaviour {
 
 		for( int y = 0; y < mapHeight; y++) {
 			for ( int x = 0; x < mapWidth; x++) {
-				if(					!tiles[y,x].GetComponent<TileStat>().lightUpdated) {
+				if(!tiles[y,x].GetComponent<TileStat>().lightUpdated) {
 						tiles[y,x].GetComponent<TileStat>().deprecateLight();
 				}
 			}
@@ -164,31 +152,6 @@ public class GameState : MonoBehaviour {
 			for ( int x = 0; x < mapWidth; x++) {
 				tiles[y,x].GetComponent<TileStat>().lightUpdated = false;
 			}
-		}
-	}
-
-	void iterateTurns() {
-		switch(currentTurn) {
-		case Turns.playerOne:
-			turnGUI.GetComponent<Text>().text = "g1";
-			currentTurn = Turns.gameOne;
-			break;
-		case Turns.playerTwo:
-			turnGUI.GetComponent<Text>().text = "g2";
-			currentTurn = Turns.gameTwo;
-			break;
-		case Turns.gameOne:
-			//monster 1's move calc
-			turnGUI.GetComponent<Text>().text = "p2";
-			playerTwo.GetComponent<Player>().fatigued = false;
-			currentTurn = Turns.playerTwo;
-			break;
-		case Turns.gameTwo:
-			//monster 2's move calc
-			turnGUI.GetComponent<Text>().text = "p1";
-			playerOne.GetComponent<Player>().fatigued = false;
-			currentTurn = Turns.playerOne;
-			break;
 		}
 	}
 
@@ -269,12 +232,6 @@ public class GameState : MonoBehaviour {
 
 		StartCoroutine ( piece.GetComponent<Animus>().movementAnimation() );
 		Camera.main.transform.GetChild(0).GetComponent<DominoSound>().moveNoise();
-		stopTurn();
-	}
-
-	public void stopTurn() {
-		timeTurner = turnLength;
-		iterateTurns();
 	}
 
 	public int tileDistance(GameObject startTile, GameObject targetTile) {
@@ -302,5 +259,26 @@ public class GameState : MonoBehaviour {
 
 		StartCoroutine ( piece.GetComponent<Animus>().movementAnimation() );
 		Camera.main.transform.GetChild(0).GetComponent<DominoSound>().moveNoise();
+	}
+
+	IEnumerator Turns() {
+		GameObject[] enemies;
+		while(true) {
+			enemies = GameObject.FindGameObjectsWithTag("Enemy");
+
+			//calc enemies move
+			if(enemies!= null) {
+				foreach (GameObject enemy in enemies) {
+					move(enemy, enemy.GetComponent<Animus>().dir);
+				}
+			}
+
+			yield return new WaitForSeconds(turnLength);
+
+			move(playerOne, playerOne.GetComponent<Animus>().dir);
+			move(playerTwo, playerTwo.GetComponent<Animus>().dir);
+
+			yield return new WaitForSeconds(turnLength);
+		}
 	}
 }
