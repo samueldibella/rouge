@@ -102,6 +102,7 @@ public class GameState : MonoBehaviour {
 		playerOneStart.GetComponent<TileStat>().occupied = true;
 		playerOneStart.GetComponent<TileStat>().occupant = playerOne;
 		playerOne.transform.parent = this.transform;
+		playerOne.gameObject.transform.GetChild(1).GetComponent<Renderer>().material.color = Color.black;
 
 		playerTwoStart = tiles[tiles[0,0].GetComponent<TileStat>().y + (firstY + secondY), tiles[0,0].GetComponent<TileStat>().x + (firstX + secondX)];
 		playerTwo = Instantiate(playerPrefab, new Vector3(secondTile.x, secondTile.y, 0), Quaternion.identity) as GameObject;
@@ -284,5 +285,7 @@ public class GameState : MonoBehaviour {
 		piece.GetComponent<Animus>().setCoords(newTile.GetComponent<TileStat>().x, newTile.GetComponent<TileStat>().y);
 		newTile.GetComponent<TileStat>().occupied = true;
 		newTile.GetComponent<TileStat>().occupant = piece;
+
+		StartCoroutine ( piece.GetComponent<Animus>().movementAnimation() );
 	}
 }
