@@ -15,9 +15,7 @@ public class GameState : MonoBehaviour {
 	public int lightRange;
 	public int lightIntensity;
 	int lightDeviation;
-	int dx;
-	int playerY, playerX;
-
+	int dx, dy;
 
 	//game state vars
 	float timeTurner;
@@ -46,7 +44,7 @@ public class GameState : MonoBehaviour {
 		mapHeight = 40;
 		mapWidth = 40;
 		tileScale = 1;
-		lightRange = 10;
+		lightRange = 7;
 		lightIntensity = 5;
 
 		turnLength = 1.0f;
@@ -126,32 +124,29 @@ public class GameState : MonoBehaviour {
 			timeTurner = turnLength;
 		}
 
-		//call on tiles within range of players; top
-		for(int i = lightRange; i >= 0; i --) {
-			for(dx = -1 * (Mathf.Abs(i - lightRange)); dx < Mathf.Abs(i - lightRange); dx++ ) {
+		for ( int y = playerOne.GetComponent<Animus>().y - lightRange; y < playerOne.GetComponent<Animus>().y + lightRange; y++) {
+			dy = y -  playerOne.GetComponent<Animus>().y;
+			dx = (int) Mathf.Sqrt(lightRange * lightRange - dy * dy );
 
-				if(isInGrid(playerOne.GetComponent<Animus>().y - i, playerOne.GetComponent<Animus>().x + dx)) {
-					tiles[playerOne.GetComponent<Animus>().y - i, playerOne.GetComponent<Animus>().x + dx].GetComponent<TileStat>().updateLight(i, dx);
-
-				}
-
-				if(isInGrid(playerTwo.GetComponent<Animus>().y - i, playerTwo.GetComponent<Animus>().x + dx)) {
-					tiles[playerTwo.GetComponent<Animus>().y - i, playerTwo.GetComponent<Animus>().x + dx].GetComponent<TileStat>().updateLight(i, dx);
+			for( int x = playerOne.GetComponent<Animus>().x - dx; x < playerOne.GetComponent<Animus>().x + dx; x++) {
+				if(isInGrid(x,y)) {
+					tiles[y,x].GetComponent<TileStat>().updateLight();
+					tiles[y,x].GetComponent<TileStat>().lightUpdated = true;
 				}
 			}
 		}
 
-		//bottom
-		for(int i = 0 - lightRange; i < 0; i++) {
-			for(dx = -1 * (Mathf.Abs(i + lightRange)); dx < Mathf.Abs(i + lightRange); dx++ ) {
-				if(isInGrid(playerOne.GetComponent<Animus>().y - i, playerOne.GetComponent<Animus>().x + dx)) {
-					tiles[playerOne.GetComponent<Animus>().y - i, playerOne.GetComponent<Animus>().x + dx].GetComponent<TileStat>().updateLight(i, dx);
-
+		for( int y = 0; y < mapHeight; y++) {
+			for ( int x = 0; x < mapWidth; x++) {
+				if(					!tiles[y,x].GetComponent<TileStat>().lightUpdated) {
+						tiles[y,x].GetComponent<TileStat>().deprecateLight();
 				}
+			}
+		}
 
-				if(isInGrid(playerTwo.GetComponent<Animus>().y - i, playerTwo.GetComponent<Animus>().x + dx)) {
-					tiles[playerTwo.GetComponent<Animus>().y - i, playerTwo.GetComponent<Animus>().x + dx].GetComponent<TileStat>().updateLight(i, dx);
-				}
+		for( int y = 0; y < mapHeight; y++) {
+			for ( int x = 0; x < mapWidth; x++) {
+				tiles[y,x].GetComponent<TileStat>().lightUpdated = false;
 			}
 		}
 	}
