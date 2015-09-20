@@ -5,11 +5,9 @@ using UnityEngine.UI;
 public class GameState : MonoBehaviour {
 
 	public GameObject tilePrefab;
-	public GameObject tileTestPrefab;
 	public GameObject tileTestWallPrefab;
 	public GameObject enemyPrefab;
 	public GameObject playerPrefab;
-	public GameObject enemyPrefab;
 	public GameObject playerOne;
 	public GameObject playerTwo;
 	public GameObject[,] tiles;
@@ -65,7 +63,7 @@ public class GameState : MonoBehaviour {
 		for(int j = 0; j < Generation.Height; j++) {
 			for(int i = 0; i < Generation.Width; i++) {
 				if ((int)Generation.Map [j, i] == 1) { 
-					tiles[j, i] = Instantiate(tileTestPrefab, new Vector3(originTile.x + (i * tileScale), originTile.y + (j * tileScale), 0), Quaternion.identity) as GameObject;
+					tiles[j, i] = Instantiate(tilePrefab, new Vector3(originTile.x + (i * tileScale), originTile.y + (j * tileScale), 0), Quaternion.identity) as GameObject;
 					tiles[j, i].transform.parent = this.transform;
 					tiles[j, i].GetComponent<TileStat>().x = i;
 					tiles[j, i].GetComponent<TileStat>().y = j;
@@ -81,7 +79,7 @@ public class GameState : MonoBehaviour {
 					tiles[j, i].GetComponent<TileStat>().y = j;
 				} else if ((int)Generation.Map [j, i] == 50)  { //enemy
 					//player 1 start
-					tiles[j, i] = Instantiate(tileTestPrefab, new Vector3(originTile.x + (i * tileScale), originTile.y + (j * tileScale), 0), Quaternion.identity) as GameObject;
+					tiles[j, i] = Instantiate(tilePrefab, new Vector3(originTile.x + (i * tileScale), originTile.y + (j * tileScale), 0), Quaternion.identity) as GameObject;
 					Instantiate(enemyPrefab, new Vector3(originTile.x + (i * tileScale), originTile.y + (j * tileScale), 0), Quaternion.identity);
 					tiles[j, i].transform.parent = this.transform;
 					tiles[j, i].GetComponent<TileStat>().x = i;
@@ -89,13 +87,13 @@ public class GameState : MonoBehaviour {
 					tiles[j, i].GetComponent<TileStat>().occupied = true; 
 				} else if ((int)Generation.Map [j, i] == 100)  { //player 1 start
 					//player 1 start
-					tiles[j, i] = Instantiate(tileTestPrefab, new Vector3(originTile.x + (i * tileScale), originTile.y + (j * tileScale), 0), Quaternion.identity) as GameObject;
+					tiles[j, i] = Instantiate(tilePrefab, new Vector3(originTile.x + (i * tileScale), originTile.y + (j * tileScale), 0), Quaternion.identity) as GameObject;
 					playerOneStart = tiles[j, i];
 					tiles[j, i].transform.parent = this.transform;
 					tiles[j, i].GetComponent<TileStat>().x = i;
 					tiles[j, i].GetComponent<TileStat>().y = j; 
 				} else if ((int)Generation.Map [j, i] == 200) { 
-					tiles[j, i] = Instantiate(tileTestPrefab, new Vector3(originTile.x + (i * tileScale), originTile.y + (j * tileScale), 0), Quaternion.identity) as GameObject;
+					tiles[j, i] = Instantiate(tilePrefab, new Vector3(originTile.x + (i * tileScale), originTile.y + (j * tileScale), 0), Quaternion.identity) as GameObject;
 					playerTwoStart = tiles[j, i];
 					tiles[j, i].transform.parent = this.transform;
 					tiles[j, i].GetComponent<TileStat>().x = i;
