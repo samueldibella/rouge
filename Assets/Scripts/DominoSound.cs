@@ -4,7 +4,7 @@ using System.Collections;
 public class DominoSound : MonoBehaviour {
 
 	AudioSource audio;
-	public AudioClip clip1, clip2, clip3, clip4, clip5;
+	public AudioClip clip1, clip2, clip3, clip4, clip5, death;
 	AudioClip chosenClip;
 
 	void Start() {
@@ -12,8 +12,12 @@ public class DominoSound : MonoBehaviour {
 	}
 
 	public void moveNoise() {
-
 		audio.clip = clip1;
+		audio.Play();
+	}
+
+	public void deathNoise() {
+		audio.clip = death;
 		audio.Play();
 	}
 

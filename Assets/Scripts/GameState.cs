@@ -8,6 +8,7 @@ public class GameState : MonoBehaviour {
 	public GameObject tileTestWallPrefab;
 	public GameObject enemyPrefab;
 	public GameObject playerPrefab;
+	public GameObject screen;
 	public GameObject playerOne;
 	public GameObject playerTwo;
 	public GameObject[,] tiles;
@@ -34,6 +35,7 @@ public class GameState : MonoBehaviour {
 	int firstY;
 	int secondX;
 	int secondY;
+	bool notAllowed = false;
 
 	Vector3 originTile;
 
@@ -203,13 +205,11 @@ public class GameState : MonoBehaviour {
 				piece.GetComponent<Player>().grow(piece.GetComponent<Animus>().location);
 				Destroy(goalTile.GetComponent<TileStat>().occupant);
 				shiftPiece(piece, goalTile);
-			} else if (piece.gameObject.tag == "Enemy" && goalTile.GetComponent<TileStat>().occupant.gameObject.tag == "Player") {
-				//end
-				//shiftPiece(piece, goalTile);
-
-			} else if (piece.gameObject.tag == "Player" && goalTile.GetComponent<TileStat>().occupant.gameObject.tag == "Player") {
-				//end
-				//shiftPiece(piece, goalTile);
+			} else {
+					if (piece.gameObject.tag == "Player" && piece.GetComponent<Animus>().moved) {
+						Debug.Log(dir);
+						StartCoroutine( LoseAnimation(piece) );
+					}
 			}
 		} else {
 			shiftPiece(piece, goalTile);
@@ -244,7 +244,6 @@ public class GameState : MonoBehaviour {
 
 		if(piece.gameObject.tag == "Player") {
 			if(piece.GetComponent<Player>(). length > 1) {
-				Debug.Log("call");
 				foreach (Transform child in piece.transform) {
 					if(child.gameObject.tag == "Segment") {
 						shiftPiece(child.gameObject, originalTile);
@@ -257,19 +256,24 @@ public class GameState : MonoBehaviour {
 		}
 
 		if (piece.gameObject.tag == "Segment") {
-			Debug.Log("segment");
-
-			if(piece.gameObject.transform.childCount > 0) {
-				Debug.Log("segmentCaller");
-				shiftPiece(piece.gameObject.transform.GetChild(0).gameObject, originalTile);
+			if(piece.gameObject.transform.childCount > 1) {
+				shiftPiece(piece.gameObject.transform.GetChild(1).gameObject, originalTile);
 			}
 		}
+
+		piece.GetComponent<Animus>().moved = true;
 			//StartCoroutine ( piece.GetComponent<Animus>().movementAnimation() );
 	}
 
 	IEnumerator Turns() {
 		GameObject[] enemies;
-		while(true) {
+		while(!notAllowed) {
+
+			move(playerOne, playerOne.GetComponent<Animus>().dir);
+			move(playerTwo, playerTwo.GetComponent<Animus>().dir);
+
+			yield return new WaitForSeconds(turnLength);
+
 			enemies = GameObject.FindGameObjectsWithTag("Enemy");
 
 			//calc enemies move
@@ -282,11 +286,24 @@ public class GameState : MonoBehaviour {
 			}
 
 			yield return new WaitForSeconds(turnLength);
-
-			move(playerOne, playerOne.GetComponent<Animus>().dir);
-			move(playerTwo, playerTwo.GetComponent<Animus>().dir);
-
-			yield return new WaitForSeconds(turnLength);
 		}
+	}
+
+	IEnumerator LoseAnimation(GameObject player) {
+		Camera.main.transform.GetChild(0).GetComponent<DominoSound>().deathNoise();
+		StopCoroutine( "Turns" );
+
+		notAllowed = true;
+
+		float timer = 1f;
+		Transform child;
+		//StartCoroutine(screen.GetComponent<ScreenControl>().LoseScreen() );
+		//Blow Up snake
+		player.GetComponent<Animus>().location.GetComponent<Renderer>().material = player.transform.GetChild(0).gameObject.GetComponent<Renderer>().material;
+		yield return new WaitForSeconds(1.5f);
+		Application.LoadLevel("Ending");
+
+
+
 	}
 }

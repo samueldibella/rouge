@@ -6,7 +6,7 @@ public class Player : MonoBehaviour {
 	public GameObject segmentPrefab;
 	GameObject manager;
 	GameObject segmentHolder;
-	GameObject tail;
+	public GameObject tail;
 	public int length;
 	int playerNumber;
 	int x;
@@ -71,14 +71,13 @@ public class Player : MonoBehaviour {
 	//tile is location new segment appears
 	public void grow(GameObject tile) {
 		segmentHolder = Instantiate(segmentPrefab, tile.transform.position, Quaternion.identity) as GameObject;
-
 		segmentHolder.transform.parent = tail.transform;
-		Debug.Log(tile);
 
+		if(playerNumber == 2) {
+			segmentHolder.transform.GetChild(0).GetComponent<Renderer>().material.color = Color.black;
+		}
 
 		segmentHolder.GetComponent<Animus>().location = tile;
-		//segmentHolder.GetComponent<Animus>().x = tile.GetComponent<TileStat>().x;
-		//segmentHolder.GetComponent<Animus>().y = tile.GetComponent<TileStat>().y;
 		segmentHolder.GetComponent<Animus>().dir = GetComponent<Animus>().dir;
 		tile.GetComponent<TileStat>().occupied = true;
 		tile.GetComponent<TileStat>().occupant = segmentHolder;

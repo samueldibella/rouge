@@ -6,8 +6,11 @@ public class Animus : MonoBehaviour {
     public char dir;
     public int x;
     public int y;
+    public bool moved = false;
+
 	// Use this for initialization
 	void Start () {
+    dir = ' ';
 	}
 
 	// Update is called once per frame
