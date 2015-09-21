@@ -6,45 +6,62 @@ public class Player : MonoBehaviour {
 	public GameObject segmentPrefab;
 	GameObject manager;
 	GameObject segmentHolder;
-	Transform segmentTraversal;
+	GameObject tail;
 	public int length;
 	int playerNumber;
 	int x;
 	int y;
 	char currentTurn;
 	public int playerSpeed;
-	public bool fatigued = true;
 
 	// Use this for initialization
 	void Start () {
 		manager = transform.parent.gameObject;
 		length = 1;
+		tail = this.gameObject;
 	}
 
 	// Update is called once per frame
 	void Update () {
-		if(!fatigued && playerNumber == 1 && manager.GetComponent<GameState>().currentTurn == GameState.Turns.playerOne) {
-
+		switch(playerNumber) {
+			case 1:
 			if(Input.GetKeyDown(KeyCode.W)) {
-				manager.GetComponent<GameState>().move(this.gameObject, 'n');
+				this.GetComponent<Animus>().dir = 'n';
 			} else if (Input.GetKeyDown(KeyCode.A)) {
-				manager.GetComponent<GameState>().move(this.gameObject, 'w');
+				this.GetComponent<Animus>().dir = 'w';
 			} else if (Input.GetKeyDown(KeyCode.S)) {
-				manager.GetComponent<GameState>().move(this.gameObject, 's');
+				this.GetComponent<Animus>().dir = 's';
 			} else if (Input.GetKeyDown(KeyCode.D)) {
-				manager.GetComponent<GameState>().move(this.gameObject, 'e');
+				this.GetComponent<Animus>().dir = 'e';
 			}
-		} else if(!fatigued && playerNumber == 2 && manager.GetComponent<GameState>().currentTurn == GameState.Turns.playerTwo) {
-			if(Input.GetKeyDown(KeyCode.Y)) {
-				manager.GetComponent<GameState>().move(this.gameObject, 'n');
-			} else if (Input.GetKeyDown(KeyCode.G)) {
-				manager.GetComponent<GameState>().move(this.gameObject, 'w');
-			} else if (Input.GetKeyDown(KeyCode.H)) {
-				manager.GetComponent<GameState>().move(this.gameObject, 's');
+				break;
+			case 2:
+			if(Input.GetKeyDown(KeyCode.I)) {
+				this.GetComponent<Animus>().dir = 'n';
 			} else if (Input.GetKeyDown(KeyCode.J)) {
-				manager.GetComponent<GameState>().move(this.gameObject, 'e');
+				this.GetComponent<Animus>().dir = 'w';
+			} else if (Input.GetKeyDown(KeyCode.K)) {
+				this.GetComponent<Animus>().dir = 's';
+			} else if (Input.GetKeyDown(KeyCode.L)) {
+				this.GetComponent<Animus>().dir = 'e';
 			}
+				break;
 		}
+/*
+		if(length > 1) {
+			segmentTraversal = this.gameObject.transform;
+
+			for(int i = 1; i < length; i++) {
+				segmentTraversal = segmentTraversal.GetChild(0);
+			}
+
+			for(int i = length; i > 1; i--) {
+				Debug.Log(this.gameObject.transform.parent);
+
+			}
+
+		}*/
+
 	}
 
 	public void setPlayerNum(int pNum) {
@@ -53,17 +70,21 @@ public class Player : MonoBehaviour {
 
 	//tile is location new segment appears
 	public void grow(GameObject tile) {
-			segmentHolder = Instantiate(segmentPrefab, tile.transform.position, Quaternion.identity) as GameObject;
-			segmentTraversal = this.gameObject.transform;
+		segmentHolder = Instantiate(segmentPrefab, tile.transform.position, Quaternion.identity) as GameObject;
 
-		if(length == 1) {
-		} else {
-			for(int i = 1; i < length; i++) {
-				segmentTraversal = segmentTraversal.GetChild(0);
-			}
-		}
+		segmentHolder.transform.parent = tail.transform;
+		Debug.Log(tile);
 
-		segmentHolder.transform.parent = segmentTraversal;
+
+		segmentHolder.GetComponent<Animus>().location = tile;
+		//segmentHolder.GetComponent<Animus>().x = tile.GetComponent<TileStat>().x;
+		//segmentHolder.GetComponent<Animus>().y = tile.GetComponent<TileStat>().y;
+		segmentHolder.GetComponent<Animus>().dir = GetComponent<Animus>().dir;
+		tile.GetComponent<TileStat>().occupied = true;
+		tile.GetComponent<TileStat>().occupant = segmentHolder;
+
+		segmentHolder.transform.parent = tail.transform;
+		tail = segmentHolder;
 		length++;
 	}
 }
