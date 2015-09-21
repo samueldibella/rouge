@@ -22,7 +22,7 @@ public class GameState : MonoBehaviour {
 	int dx, dy;
 
 	//game state vars
-	float turnLength;
+	public float turnLength;
 	public	char currentMove = ' ';
 
 
@@ -77,6 +77,7 @@ public class GameState : MonoBehaviour {
 					//player 1 start
 					tiles[j, i] = Instantiate(tilePrefab, new Vector3(originTile.x + (i * tileScale), originTile.y + (j * tileScale), 0), Quaternion.identity) as GameObject;
 					tiles[j, i].GetComponent<TileStat>().occupant = Instantiate(enemyPrefab, new Vector3(originTile.x + (i * tileScale), originTile.y + (j * tileScale), 0), Quaternion.identity) as GameObject;
+					tiles[j, i].GetComponent<TileStat>().occupant.transform.parent = this.transform; 
 					tiles[j, i].GetComponent<TileStat>().occupant.GetComponent<Animus>().x = i;
 					tiles[j, i].GetComponent<TileStat>().occupant.GetComponent<Animus>().y = j;
 					tiles[j, i].GetComponent<TileStat>().occupant.GetComponent<Animus>().location = tiles[j,i];
