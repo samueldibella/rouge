@@ -36,7 +36,7 @@ public class Generation : MonoBehaviour
 	public static Vector2 QuadPoint3; 
 	public static Vector2 QuadPoint4; 
 	
-	int maxEnemies = 5;
+	public int maxEnemies = 5;
 
 	// list of active rooms and the room xml templates
 	public List<Rect> Rooms;
