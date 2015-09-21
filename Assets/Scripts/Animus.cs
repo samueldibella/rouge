@@ -21,7 +21,7 @@ public class Animus : MonoBehaviour {
   }
 
   public IEnumerator movementAnimation() {
-    Vector3 original = new Vector3(    this.transform.GetChild(0).transform.localScale.x, this.transform.GetChild(0).transform.localScale.y, this.transform.GetChild(0).transform.localScale.z
+    Vector3 original = new Vector3( this.transform.GetChild(0).transform.localScale.x, this.transform.GetChild(0).transform.localScale.y, this.transform.GetChild(0).transform.localScale.z
 );
     int time = 0;
     float scaleAlt = .3f;

@@ -22,6 +22,10 @@ public class TileStat : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		this.gameObject.transform.GetChild(1).GetComponent<Renderer>().material.SetColor("_Color", color);
+
+		if(occupant != null) {
+			occupant.transform.position = this.gameObject.transform.position;
+		}
 	}
 
 	public GameObject getNeighbor(char dir) {

@@ -6,7 +6,7 @@ public class Player : MonoBehaviour {
 	public GameObject segmentPrefab;
 	GameObject manager;
 	GameObject segmentHolder;
-	Transform segmentTraversal;
+	GameObject tail;
 	public int length;
 	int playerNumber;
 	int x;
@@ -18,6 +18,7 @@ public class Player : MonoBehaviour {
 	void Start () {
 		manager = transform.parent.gameObject;
 		length = 1;
+		tail = this.gameObject;
 	}
 
 	// Update is called once per frame
@@ -46,6 +47,20 @@ public class Player : MonoBehaviour {
 			}
 				break;
 		}
+/*
+		if(length > 1) {
+			segmentTraversal = this.gameObject.transform;
+
+			for(int i = 1; i < length; i++) {
+				segmentTraversal = segmentTraversal.GetChild(0);
+			}
+
+			for(int i = length; i > 1; i--) {
+				Debug.Log(this.gameObject.transform.parent);
+
+			}
+
+		}*/
 
 	}
 
@@ -55,17 +70,21 @@ public class Player : MonoBehaviour {
 
 	//tile is location new segment appears
 	public void grow(GameObject tile) {
-			segmentHolder = Instantiate(segmentPrefab, tile.transform.position, Quaternion.identity) as GameObject;
-			segmentTraversal = this.gameObject.transform;
+		segmentHolder = Instantiate(segmentPrefab, tile.transform.position, Quaternion.identity) as GameObject;
 
-		if(length == 1) {
-		} else {
-			for(int i = 1; i < length; i++) {
-				segmentTraversal = segmentTraversal.GetChild(0);
-			}
-		}
+		segmentHolder.transform.parent = tail.transform;
+		Debug.Log(tile);
 
-		segmentHolder.transform.parent = segmentTraversal;
+
+		segmentHolder.GetComponent<Animus>().location = tile;
+		//segmentHolder.GetComponent<Animus>().x = tile.GetComponent<TileStat>().x;
+		//segmentHolder.GetComponent<Animus>().y = tile.GetComponent<TileStat>().y;
+		segmentHolder.GetComponent<Animus>().dir = GetComponent<Animus>().dir;
+		tile.GetComponent<TileStat>().occupied = true;
+		tile.GetComponent<TileStat>().occupant = segmentHolder;
+
+		segmentHolder.transform.parent = tail.transform;
+		tail = segmentHolder;
 		length++;
 	}
 }

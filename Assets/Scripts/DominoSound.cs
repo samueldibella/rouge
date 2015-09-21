@@ -12,11 +12,14 @@ public class DominoSound : MonoBehaviour {
 	}
 
 	public void moveNoise() {
-		int num = Random.Range(0,5);
+
+		audio.clip = clip1;
+		audio.Play();
+	}
+
+	public void captureNoise() {
+		int num = Random.Range(1,5);
 		switch(num) {
-			case 0:
-				chosenClip = clip1;
-				break;
 			case 1:
 				chosenClip = clip2;
 				break;
