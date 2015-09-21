@@ -10,29 +10,38 @@ public class Enemy : MonoBehaviour {
 	GameObject [] players; 
 	bool running = false; 
 	public IEnumerator routine;
+	float turnLength;
 
 	void Start () {
 		manager = transform.parent.gameObject;
 		routine = RndMove();
 		players = GameObject.FindGameObjectsWithTag("Respawn");
+		turnLength = transform.parent.GetComponent<GameState>().turnLength; 
 		StartCoroutine(routine); 
+		StartCoroutine("watch");
 	}
 
-	void Update () {
+	IEnumerator watch() {
+		while(true) {
 		RaycastHit hit;
 		if(running == false) {
 			foreach(GameObject next in players)  {
-				if(Physics.Raycast(transform.position, (next.transform.position - transform.position), out hit, maxRange))
-				{
-					if(hit.transform == next.transform && running == false)
-					{
-						StopCoroutine(routine);
-						StartCoroutine(SeenMove(next));
-						running = true; 
-						break; 
+				if (next != null) {
+					if(Physics.Raycast(transform.position, (next.transform.position - transform.position), out hit, maxRange))
+						{
+							if(hit.transform == next.transform && running == false)
+							{
+								print("ahh");
+								StopCoroutine(routine);
+								StartCoroutine(SeenMove(next));
+								running = true; 
+								break; 
+							}
+						}
 					}
 				}
 			}
+			yield return new WaitForSeconds(turnLength); 
 		}
 	}
 
@@ -42,20 +51,20 @@ public class Enemy : MonoBehaviour {
 			while(moved == false) {
 				rndNum = Random.Range(0, 4);
 				if(rndNum == 0 && GetComponent<Animus>().location.GetComponent<TileStat>().getNeighbor('n').GetComponent<TileStat>().occupied == false) {
-					manager.GetComponent<GameState>().move(this.gameObject, 'n');
+					GetComponent<Animus>().dir = 'n'; 
 					moved = true;
 				} else if(rndNum == 1 && GetComponent<Animus>().location.GetComponent<TileStat>().getNeighbor('e').GetComponent<TileStat>().occupied == false) {
-					manager.GetComponent<GameState>().move(this.gameObject, 'e');
+					GetComponent<Animus>().dir = 'e'; 
 					moved = true;
 				} else if(rndNum == 2 && GetComponent<Animus>().location.GetComponent<TileStat>().getNeighbor('w').GetComponent<TileStat>().occupied == false) {
-					manager.GetComponent<GameState>().move(this.gameObject, 'w');
+					GetComponent<Animus>().dir = 'w'; 
 					moved = true;
 				} else if(rndNum == 3 && GetComponent<Animus>().location.GetComponent<TileStat>().getNeighbor('s').GetComponent<TileStat>().occupied == false) {
-					manager.GetComponent<GameState>().move(this.gameObject, 's');
+					GetComponent<Animus>().dir = 's'; 
 					moved = true;
 				} 
 			}
-			yield return new WaitForSeconds(.5f); 
+			yield return new WaitForSeconds(turnLength); 
 		}
 	}
 
@@ -71,13 +80,13 @@ public class Enemy : MonoBehaviour {
 				while(moved == false) {
 					rndNum = Random.Range(0, 2);
 					if(rndNum == 0 && GetComponent<Animus>().location.GetComponent<TileStat>().getNeighbor('s').GetComponent<TileStat>().occupied == false) {
-						manager.GetComponent<GameState>().move(this.gameObject, 's');
+						GetComponent<Animus>().dir = 's'; 
 						moved = true;
 					} else if(rndNum == 1 && GetComponent<Animus>().location.GetComponent<TileStat>().getNeighbor('e').GetComponent<TileStat>().occupied == false) {
-						manager.GetComponent<GameState>().move(this.gameObject, 'e');
+						GetComponent<Animus>().dir = 'e';
 						moved = true;
 					} else {
-						manager.GetComponent<GameState>().move(this.gameObject, 'e');
+						GetComponent<Animus>().dir = 'e'; 
 						moved = true;
 					}
 				}
@@ -85,13 +94,13 @@ public class Enemy : MonoBehaviour {
 				while(moved == false) {
 					rndNum = Random.Range(0, 2);
 					if(rndNum == 0 && GetComponent<Animus>().location.GetComponent<TileStat>().getNeighbor('s').GetComponent<TileStat>().occupied == false) {
-						manager.GetComponent<GameState>().move(this.gameObject, 's');
+						GetComponent<Animus>().dir = 's'; 
 						moved = true;
 					} else if(rndNum == 1 && GetComponent<Animus>().location.GetComponent<TileStat>().getNeighbor('w').GetComponent<TileStat>().occupied == false) {
-						manager.GetComponent<GameState>().move(this.gameObject, 'w');
+						GetComponent<Animus>().dir = 'w'; 
 						moved = true;
 					} else {
-						manager.GetComponent<GameState>().move(this.gameObject, 's');
+						GetComponent<Animus>().dir = 's'; 
 						moved = true;
 					}
 				}
@@ -99,13 +108,13 @@ public class Enemy : MonoBehaviour {
 				while(moved == false) {
 					rndNum = Random.Range(0, 2);
 					if(rndNum == 0 && GetComponent<Animus>().location.GetComponent<TileStat>().getNeighbor('n').GetComponent<TileStat>().occupied == false) {
-						manager.GetComponent<GameState>().move(this.gameObject, 'n');
+						GetComponent<Animus>().dir = 'n'; 
 						moved = true;
 					} else if(rndNum == 1 && GetComponent<Animus>().location.GetComponent<TileStat>().getNeighbor('e').GetComponent<TileStat>().occupied == false) {
-						manager.GetComponent<GameState>().move(this.gameObject, 'e');
+						GetComponent<Animus>().dir = 'e'; 
 						moved = true;
 					} else {
-						manager.GetComponent<GameState>().move(this.gameObject, 'n');
+						GetComponent<Animus>().dir = 'n'; 
 						moved = true;
 					}
 				}
@@ -113,19 +122,19 @@ public class Enemy : MonoBehaviour {
 				while(moved == false) {
 					rndNum = Random.Range(0, 2);
 					if(rndNum == 0 && GetComponent<Animus>().location.GetComponent<TileStat>().getNeighbor('n').GetComponent<TileStat>().occupied == false) {
-						manager.GetComponent<GameState>().move(this.gameObject, 'n');
+						GetComponent<Animus>().dir = 'n'; 
 						moved = true;
 					} else if(rndNum == 1 && GetComponent<Animus>().location.GetComponent<TileStat>().getNeighbor('w').GetComponent<TileStat>().occupied == false) {
-						manager.GetComponent<GameState>().move(this.gameObject, 'w');
+						GetComponent<Animus>().dir = 'w'; 
 						moved = true;
 					} else {
-						manager.GetComponent<GameState>().move(this.gameObject, 'w');
+						GetComponent<Animus>().dir = 'w'; 
 						moved = true;
 					}
 				}
 			}
 			turnsRunning++;
-			yield return new WaitForSeconds (.5f);
+			yield return new WaitForSeconds (turnLength);
 		}
 		StartCoroutine("RndMove");
 		running = false; 

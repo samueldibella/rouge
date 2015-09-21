@@ -31,8 +31,8 @@ public class Generation : MonoBehaviour
 	public static Vector2 StartPostion; 
 	public static Vector2 EndPostion; 
 	
-	int maxEnemies = 5;
-	int currentEnemies = 1;
+	int maxEnemies = 1;
+	public static int currentEnemies = 5;
 	// list of active rooms and the room xml templates
 	public List<Rect> Rooms;
 	//public List<XmlElement> RoomTemplates;
