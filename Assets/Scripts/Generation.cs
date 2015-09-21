@@ -30,9 +30,14 @@ public class Generation : MonoBehaviour
 	public int Padding = 4;
 	public static Vector2 StartPostion; 
 	public static Vector2 EndPostion; 
+
+	public static Vector2 QuadPoint1; 
+	public static Vector2 QuadPoint2; 
+	public static Vector2 QuadPoint3; 
+	public static Vector2 QuadPoint4; 
 	
 	int maxEnemies = 5;
-	int currentEnemies = 1;
+
 	// list of active rooms and the room xml templates
 	public List<Rect> Rooms;
 	//public List<XmlElement> RoomTemplates;
@@ -78,6 +83,10 @@ public class Generation : MonoBehaviour
 		EndPostion = new Vector2(currentPath.First().x, currentPath.First().y); 
 	}
 
+	public void findQuadPoints() {
+
+
+	}
 	public void genEnemies() {
 		for (int i = 0; i < maxEnemies; i++) {
 			Vector2 rnd = GetRandomPosition();

@@ -78,13 +78,17 @@ public class GameState : MonoBehaviour {
 					tiles[j, i].GetComponent<TileStat>().x = i;
 					tiles[j, i].GetComponent<TileStat>().y = j;
 				} else if ((int)Generation.Map [j, i] == 50)  { //enemy
-					//player 1 start
+					//Enemy start
 					tiles[j, i] = Instantiate(tilePrefab, new Vector3(originTile.x + (i * tileScale), originTile.y + (j * tileScale), 0), Quaternion.identity) as GameObject;
-					Instantiate(enemyPrefab, new Vector3(originTile.x + (i * tileScale), originTile.y + (j * tileScale), 0), Quaternion.identity);
 					tiles[j, i].transform.parent = this.transform;
 					tiles[j, i].GetComponent<TileStat>().x = i;
 					tiles[j, i].GetComponent<TileStat>().y = j; 
 					tiles[j, i].GetComponent<TileStat>().occupied = true; 
+					tiles[j, i].GetComponent<TileStat>().occupant = Instantiate(enemyPrefab, new Vector3(originTile.x + (i * tileScale), originTile.y + (j * tileScale), 0), Quaternion.identity) as GameObject; 
+					tiles[j, i].GetComponent<TileStat>().occupant.transform.parent = this.transform;
+					tiles[j, i].GetComponent<TileStat>().occupant.GetComponent<Animus>().setCoords(i, j);
+					tiles[j, i].GetComponent<TileStat>().occupant.GetComponent<Animus>().location = tiles[j, i];
+
 				} else if ((int)Generation.Map [j, i] == 100)  { //player 1 start
 					//player 1 start
 					tiles[j, i] = Instantiate(tilePrefab, new Vector3(originTile.x + (i * tileScale), originTile.y + (j * tileScale), 0), Quaternion.identity) as GameObject;
@@ -92,7 +96,7 @@ public class GameState : MonoBehaviour {
 					tiles[j, i].transform.parent = this.transform;
 					tiles[j, i].GetComponent<TileStat>().x = i;
 					tiles[j, i].GetComponent<TileStat>().y = j; 
-				} else if ((int)Generation.Map [j, i] == 200) { 
+				} else if ((int)Generation.Map [j, i] == 200) { //player 2 start
 					tiles[j, i] = Instantiate(tilePrefab, new Vector3(originTile.x + (i * tileScale), originTile.y + (j * tileScale), 0), Quaternion.identity) as GameObject;
 					playerTwoStart = tiles[j, i];
 					tiles[j, i].transform.parent = this.transform;
@@ -276,7 +280,7 @@ public class GameState : MonoBehaviour {
 		}
 
 		StartCoroutine ( piece.GetComponent<Animus>().movementAnimation() );
-		Camera.main.transform.GetChild(0).GetComponent<DominoSound>().moveNoise();
+		//Camera.main.transform.GetChild(0).GetComponent<DominoSound>().moveNoise();
 		stopTurn();
 	}
 
@@ -309,6 +313,6 @@ public class GameState : MonoBehaviour {
 		newTile.GetComponent<TileStat>().occupant = piece;
 
 		StartCoroutine ( piece.GetComponent<Animus>().movementAnimation() );
-		Camera.main.transform.GetChild(0).GetComponent<DominoSound>().moveNoise();
+		//Camera.main.transform.GetChild(0).GetComponent<DominoSound>().moveNoise();
 	}
 }

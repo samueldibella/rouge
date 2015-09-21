@@ -27,13 +27,13 @@ public class TileStat : MonoBehaviour {
 	public GameObject getNeighbor(char dir) {
 		switch(dir) {
 			case 'n':
-				return manager.GetComponent<GameState>().tiles[y - 1, x];
+				return manager.GetComponent<GameState>().tiles[y + 1, x];
 			case 'w':
 				return manager.GetComponent<GameState>().tiles[y, x - 1];
 			case 'e':
 				return manager.GetComponent<GameState>().tiles[y, x + 1];
 			case 's':
-				return manager.GetComponent<GameState>().tiles[y + 1, x];
+				return manager.GetComponent<GameState>().tiles[y - 1, x];
 			default:
 				return null;
 		}

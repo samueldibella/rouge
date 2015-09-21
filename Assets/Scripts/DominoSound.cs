@@ -33,7 +33,7 @@ public class DominoSound : MonoBehaviour {
 
 		Debug.Log(chosenClip);
 
-		audio.clip = chosenClip;
+		//audio.clip = chosenClip;
 		audio.Play();
 	}
 
