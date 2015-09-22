@@ -11,7 +11,6 @@ public class Enemy : MonoBehaviour {
 	bool running = false; 
 	public IEnumerator routine;
 	int i; 
-
 	void Start () {
 		manager = transform.parent.gameObject;
 		routine = RndMove();
@@ -27,10 +26,11 @@ public class Enemy : MonoBehaviour {
 				{
 					if(hit.transform == next.transform && running == false)
 					{
+						print ("ahhhh");
 						StopCoroutine(routine);
 						StartCoroutine(SeenMove(next));
 						running = true; 
-						yield break; 
+						break; 
 					}
 				}
 			}
