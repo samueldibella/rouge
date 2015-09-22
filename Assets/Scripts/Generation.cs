@@ -29,14 +29,11 @@ public class Generation : MonoBehaviour
 	public int Grid = 16;
 	public int Padding = 4;
 	public static Vector2 StartPostion; 
-	public static Vector2 EndPostion; 
+	public static Vector2 EndPostion;  
 
-	public static Vector2 QuadPoint1; 
-	public static Vector2 QuadPoint2; 
-	public static Vector2 QuadPoint3; 
-	public static Vector2 QuadPoint4; 
-	
-	public int maxEnemies = 5;
+	public static int maxEnemies = 5;
+	public static int level = 1; 
+	public static int score = 0; 
 
 	// list of active rooms and the room xml templates
 	public List<Rect> Rooms;

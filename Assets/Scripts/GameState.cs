@@ -11,6 +11,7 @@ public class GameState : MonoBehaviour {
 	public GameObject playerOne;
 	public GameObject playerTwo;
 	public GameObject[,] tiles;
+	GameObject[] enemies;
 	public GameObject turnGUI;
 	public int mapHeight;
 	public int mapWidth;
@@ -20,12 +21,10 @@ public class GameState : MonoBehaviour {
 	int playerY, playerX;
 	int dx, dy;
 
+	public int eatenEnemies = 0; 
+
 	//game state vars
-	float timeTurner;
-	float turnLength;
-	public enum Turns {playerOne, gameOne, playerTwo, gameTwo};
-	public Turns currentTurn = Turns.playerOne;
-	int globalTurn;
+	public float turnLength;
 	public	char currentMove = ' ';
 
 
@@ -43,52 +42,50 @@ public class GameState : MonoBehaviour {
 
 	// Use this for initialization
 	void Awake () {
-		globalTurn = 0;
 		mapHeight = 40;
 		mapWidth = 40;
 		tileScale = 1;
-		lightRange = 7;
+		lightRange = 8;
 		lightIntensity = 5;
-
-		turnLength = 1.0f;
-		timeTurner = 0f;
-
+		turnLength = .1f;
 		originTile = Vector3.zero;
 
 
 		//generate map
-		this.GetComponent<Generation>().GenerateMap();  
+		this.GetComponent<Generation>().GenerateMap();
 		tiles = new GameObject[Generation.Width, Generation.Height];
 		//print map
 		for(int j = 0; j < Generation.Height; j++) {
 			for(int i = 0; i < Generation.Width; i++) {
-				if ((int)Generation.Map [j, i] == 1) { 
+				if ((int)Generation.Map [j, i] == 1) {
 					tiles[j, i] = Instantiate(tilePrefab, new Vector3(originTile.x + (i * tileScale), originTile.y + (j * tileScale), 0), Quaternion.identity) as GameObject;
 					tiles[j, i].transform.parent = this.transform;
 					tiles[j, i].GetComponent<TileStat>().x = i;
 					tiles[j, i].GetComponent<TileStat>().y = j;
-				} else if ((int)Generation.Map[j, i] == 4) { 
+				} else if ((int)Generation.Map[j, i] == 4) {
 					tiles[j, i] = Instantiate(tileTestWallPrefab, new Vector3(originTile.x + (i * tileScale), originTile.y + (j * tileScale), 0), Quaternion.identity) as GameObject;
+					tiles[j, i].GetComponent<TileStat>().occupant = tiles[j,i];
 					tiles[j, i].transform.parent = this.transform;
 					tiles[j, i].GetComponent<TileStat>().x = i;
 					tiles[j, i].GetComponent<TileStat>().y = j;
-				} else if ((int)Generation.Map [j, i] == 20) { 
+				} else if ((int)Generation.Map [j, i] == 20) {
 					tiles[j, i] = Instantiate(tileTestWallPrefab, new Vector3(originTile.x + (i * tileScale), originTile.y + (j * tileScale), 0), Quaternion.identity) as GameObject;
+					tiles[j, i].GetComponent<TileStat>().occupant = tiles[j,i];
 					tiles[j, i].transform.parent = this.transform;
 					tiles[j, i].GetComponent<TileStat>().x = i;
 					tiles[j, i].GetComponent<TileStat>().y = j;
 				} else if ((int)Generation.Map [j, i] == 50)  { //enemy
 					//Enemy start
 					tiles[j, i] = Instantiate(tilePrefab, new Vector3(originTile.x + (i * tileScale), originTile.y + (j * tileScale), 0), Quaternion.identity) as GameObject;
+					tiles[j, i].GetComponent<TileStat>().occupant = Instantiate(enemyPrefab, new Vector3(originTile.x + (i * tileScale), originTile.y + (j * tileScale), 0), Quaternion.identity) as GameObject;
+					tiles[j, i].GetComponent<TileStat>().occupant.transform.parent = this.transform; 
+					tiles[j, i].GetComponent<TileStat>().occupant.GetComponent<Animus>().x = i;
+					tiles[j, i].GetComponent<TileStat>().occupant.GetComponent<Animus>().y = j;
+					tiles[j, i].GetComponent<TileStat>().occupant.GetComponent<Animus>().location = tiles[j,i];
 					tiles[j, i].transform.parent = this.transform;
 					tiles[j, i].GetComponent<TileStat>().x = i;
-					tiles[j, i].GetComponent<TileStat>().y = j; 
-					tiles[j, i].GetComponent<TileStat>().occupied = true; 
-					tiles[j, i].GetComponent<TileStat>().occupant = Instantiate(enemyPrefab, new Vector3(originTile.x + (i * tileScale), originTile.y + (j * tileScale), 0), Quaternion.identity) as GameObject; 
-					tiles[j, i].GetComponent<TileStat>().occupant.transform.parent = this.transform;
-					tiles[j, i].GetComponent<TileStat>().occupant.GetComponent<Animus>().setCoords(i, j);
-					tiles[j, i].GetComponent<TileStat>().occupant.GetComponent<Animus>().location = tiles[j, i];
-
+					tiles[j, i].GetComponent<TileStat>().y = j;
+					tiles[j, i].GetComponent<TileStat>().occupied = true;
 				} else if ((int)Generation.Map [j, i] == 100)  { //player 1 start
 					//player 1 start
 					tiles[j, i] = Instantiate(tilePrefab, new Vector3(originTile.x + (i * tileScale), originTile.y + (j * tileScale), 0), Quaternion.identity) as GameObject;
@@ -122,31 +119,28 @@ public class GameState : MonoBehaviour {
 		playerTwo.GetComponent<Animus>().setCoords(playerTwoStart.GetComponent<TileStat>().x, playerTwoStart.GetComponent<TileStat>().y);
 		playerTwo.GetComponent<Animus>().location = playerTwoStart;
 		playerTwoStart.GetComponent<TileStat>().occupied = true;
-		playerTwoStart.GetComponent<TileStat>().occupant = playerOne;
+		playerTwoStart.GetComponent<TileStat>().occupant = playerTwo;
 		playerTwo.transform.parent = this.transform;
 	}
 
 	void Start () {
-		currentTurn = Turns.playerOne;
-		turnGUI.GetComponent<Text>().text = "p1";
-		playerOne.GetComponent<Player>().fatigued = false;
-		timeTurner = turnLength;
+		enemies = GameObject.FindGameObjectsWithTag("Enemy");
+		StartCoroutine( Turns() );
 	}
 
 	void Update () {
-		timeTurner = timeTurner - Time.deltaTime;
-		if (timeTurner <= 0) {
-			iterateTurns();
-			timeTurner = turnLength;
+		if(eatenEnemies == Generation.maxEnemies) {
+			Generation.level++; 
+			Generation.maxEnemies = Generation.maxEnemies + (Generation.level/2);
+			Application.LoadLevel(Application.loadedLevel); 
 		}
-
 		for ( int y = playerOne.GetComponent<Animus>().y - lightRange; y < playerOne.GetComponent<Animus>().y + lightRange; y++) {
 			dy = y -  playerOne.GetComponent<Animus>().y;
 			dx = (int) Mathf.Sqrt(lightRange * lightRange - dy * dy );
 
 			for( int x = playerOne.GetComponent<Animus>().x - dx; x < playerOne.GetComponent<Animus>().x + dx; x++) {
 				if(isInGrid(x,y)) {
-					tiles[y,x].GetComponent<TileStat>().updateLight();
+					tiles[y,x].GetComponent<TileStat>().updateLight(Mathf.Abs(x), Mathf.Abs(y));
 					tiles[y,x].GetComponent<TileStat>().lightUpdated = true;
 				}
 			}
@@ -157,8 +151,8 @@ public class GameState : MonoBehaviour {
 			dx = (int) Mathf.Sqrt(lightRange * lightRange - dy * dy );
 
 			for( int x = playerTwo.GetComponent<Animus>().x - dx; x < playerTwo.GetComponent<Animus>().x + dx; x++) {
-				if(isInGrid(x,y)) {
-					tiles[y,x].GetComponent<TileStat>().updateLight();
+				if(isInGrid(x,y) && !(y == 0 && (x == playerTwo.GetComponent<Animus>().x - dx || x ==  playerTwo.GetComponent<Animus>().x + dx))) {
+					tiles[y,x].GetComponent<TileStat>().updateLight(Mathf.Abs(x), Mathf.Abs(y));
 					tiles[y,x].GetComponent<TileStat>().lightUpdated = true;
 				}
 			}
@@ -166,7 +160,7 @@ public class GameState : MonoBehaviour {
 
 		for( int y = 0; y < mapHeight; y++) {
 			for ( int x = 0; x < mapWidth; x++) {
-				if(					!tiles[y,x].GetComponent<TileStat>().lightUpdated) {
+				if(!tiles[y,x].GetComponent<TileStat>().lightUpdated) {
 						tiles[y,x].GetComponent<TileStat>().deprecateLight();
 				}
 			}
@@ -176,31 +170,6 @@ public class GameState : MonoBehaviour {
 			for ( int x = 0; x < mapWidth; x++) {
 				tiles[y,x].GetComponent<TileStat>().lightUpdated = false;
 			}
-		}
-	}
-
-	void iterateTurns() {
-		switch(currentTurn) {
-		case Turns.playerOne:
-			turnGUI.GetComponent<Text>().text = "g1";
-			currentTurn = Turns.gameOne;
-			break;
-		case Turns.playerTwo:
-			turnGUI.GetComponent<Text>().text = "g2";
-			currentTurn = Turns.gameTwo;
-			break;
-		case Turns.gameOne:
-			//monster 1's move calc
-			turnGUI.GetComponent<Text>().text = "p2";
-			playerTwo.GetComponent<Player>().fatigued = false;
-			currentTurn = Turns.playerTwo;
-			break;
-		case Turns.gameTwo:
-			//monster 2's move calc
-			turnGUI.GetComponent<Text>().text = "p1";
-			playerOne.GetComponent<Player>().fatigued = false;
-			currentTurn = Turns.playerOne;
-			break;
 		}
 	}
 
@@ -214,79 +183,54 @@ public class GameState : MonoBehaviour {
 		switch(dir) {
 		case 'n':
 			if(goalY < mapHeight - 1) {
-					goalTile = tiles[goalY + 1, goalX];
+				goalTile = tiles[goalY + 1, goalX];
+				piece.GetComponent<Animus>().lastDir = dir; //for no reverse movement
+
 			}
 			break;
 		case 'w':
 			if(goalX > 0) {
 				goalTile = tiles[goalY, goalX - 1];
+				piece.GetComponent<Animus>().lastDir = dir;
 			}
 			break;
 		case 'e':
 			if(goalX < mapWidth - 1) {
 				goalTile = tiles[goalY, goalX + 1];
+				piece.GetComponent<Animus>().lastDir = dir;
 			}
 			break;
 		case 's':
 			if(goalY > 0) {
 				goalTile = tiles[goalY - 1, goalX];
+				piece.GetComponent<Animus>().lastDir = dir;
 			}
 			break;
 		default:
 			break;
 		}
 
-		if(!goalTile.GetComponent<TileStat>().occupied) {
-			if(piece.gameObject.tag == "Player" && piece.GetComponent<Player>().length > 1) {
-				segmentTraversal = piece.transform;
+		if(goalTile.GetComponent<TileStat>().occupied) {
+			if (piece.gameObject.tag == "Player" && goalTile.GetComponent<TileStat>().occupant.gameObject.tag == "Enemy") {
+				piece.GetComponent<Player>().grow(piece.GetComponent<Animus>().location);
+				Destroy(goalTile.GetComponent<TileStat>().occupant);
+				shiftPiece(piece, goalTile);
+				//keeps track of eaten enimies
+				Generation.score++; 
+				eatenEnemies++; 
+			} else if (piece.gameObject.tag == "Enemy" && goalTile.GetComponent<TileStat>().occupant.gameObject.tag == "Player") {
+				//end
+				//shiftPiece(piece, goalTile);
 
-				for(int i = 1; i < piece.GetComponent<Player>().length; i++ ) {
-					segmentTraversal = piece.transform.GetChild(0);
-				}
-				segmentTraversal.gameObject.GetComponent<Animus>().location.GetComponent<TileStat>().occupied = false;
-				segmentTraversal.gameObject.GetComponent<Animus>().location.GetComponent<TileStat>().occupant = null;
-
-				for(int i = piece.GetComponent<Player>().length; i > 1; i--) {
-					segmentTraversal.gameObject.transform.position = segmentTraversal.parent.transform.position;
-					segmentTraversal.gameObject.GetComponent<Animus>().location = segmentTraversal.parent.transform.gameObject.GetComponent<Animus>().location;
-					segmentTraversal.gameObject.GetComponent<Animus>().setCoords(	segmentTraversal.gameObject.GetComponent<Animus>().location.GetComponent<TileStat>().x,	segmentTraversal.gameObject.GetComponent<Animus>().location.GetComponent<TileStat>().y);
-					segmentTraversal.gameObject.GetComponent<Animus>().location.GetComponent<TileStat>().occupied = true;
-					segmentTraversal.gameObject.GetComponent<Animus>().location.GetComponent<TileStat>().occupant = piece;
-
-					segmentTraversal = segmentTraversal.parent.transform;
-				}
-
-
-				piece.transform.position = goalTile.transform.position;
-				piece.GetComponent<Animus>().location = goalTile;
-				piece.GetComponent<Animus>().setCoords(goalTile.GetComponent<TileStat>().x, goalTile.GetComponent<TileStat>().y);
-				goalTile.GetComponent<TileStat>().occupied = true;
-				goalTile.GetComponent<TileStat>().occupant = piece;
+			} else if (piece.gameObject.tag == "Player" && goalTile.GetComponent<TileStat>().occupant.gameObject.tag == "Player") {
+				//end
+				//shiftPiece(piece, goalTile);
 			}
-
+		} else {
 			shiftPiece(piece, goalTile);
-		} else if (piece.gameObject.tag == "Player" && goalTile.GetComponent<TileStat>().occupant.gameObject.tag == "Enemy") {
-			Destroy(goalTile.GetComponent<TileStat>().occupant);
-			piece.GetComponent<Player>().grow(piece.GetComponent<Animus>().location);
-
-			shiftPiece(piece, goalTile);
-		} else if (piece.gameObject.tag == "Enemy" && goalTile.GetComponent<TileStat>().occupant.gameObject.tag == "Player") {
-			//end
-			//shiftPiece(piece, goalTile);
-
-		} else if (piece.gameObject.tag == "Player" && goalTile.GetComponent<TileStat>().occupant.gameObject.tag == "Player") {
-			//end
-			//shiftPiece(piece, goalTile);
 		}
 
-		StartCoroutine ( piece.GetComponent<Animus>().movementAnimation() );
 		//Camera.main.transform.GetChild(0).GetComponent<DominoSound>().moveNoise();
-		stopTurn();
-	}
-
-	public void stopTurn() {
-		timeTurner = turnLength;
-		iterateTurns();
 	}
 
 	public int tileDistance(GameObject startTile, GameObject targetTile) {
@@ -304,15 +248,60 @@ public class GameState : MonoBehaviour {
 
 	//not used for turns, just raw movement
 	void shiftPiece(GameObject piece, GameObject newTile) {
+		GameObject originalTile = piece.GetComponent<Animus>().location;
+
 		piece.GetComponent<Animus>().location.GetComponent<TileStat>().occupied = false;
 		piece.GetComponent<Animus>().location.GetComponent<TileStat>().occupant = null;
-		piece.transform.position = newTile.transform.position;
 		piece.GetComponent<Animus>().location = newTile;
-		piece.GetComponent<Animus>().setCoords(newTile.GetComponent<TileStat>().x, newTile.GetComponent<TileStat>().y);
+		piece.transform.position = newTile.transform.position;
+
 		newTile.GetComponent<TileStat>().occupied = true;
 		newTile.GetComponent<TileStat>().occupant = piece;
+		piece.GetComponent<Animus>().setCoords(newTile.GetComponent<TileStat>().x, newTile.GetComponent<TileStat>().y);
 
-		StartCoroutine ( piece.GetComponent<Animus>().movementAnimation() );
-		//Camera.main.transform.GetChild(0).GetComponent<DominoSound>().moveNoise();
+		if(piece.gameObject.tag == "Player") {
+			if(piece.GetComponent<Player>().length > 1) {
+
+				foreach (Transform child in piece.transform) {
+					if(child.gameObject.tag == "Segment") {
+						shiftPiece(child.gameObject, originalTile);
+					}
+				}
+			}
+
+			StartCoroutine ( piece.GetComponent<Animus>().movementAnimation() );
+			Camera.main.transform.GetChild(0).GetComponent<DominoSound>().moveNoise();
+		}
+
+		if (piece.gameObject.tag == "Segment") {
+
+
+			if(piece.gameObject.transform.childCount > 0) {
+
+				shiftPiece(piece.gameObject.transform.GetChild(0).gameObject, originalTile);
+			}
+		}
+			//StartCoroutine ( piece.GetComponent<Animus>().movementAnimation() );
+	}
+	
+
+	IEnumerator Turns() {
+		while(true) {
+			//calc enemies move
+			if(enemies!= null) {
+				foreach (GameObject enemy in enemies) {
+					if(enemy != null) {
+						move(enemy, enemy.GetComponent<Animus>().dir);
+					}
+				}
+			}
+
+			yield return new WaitForSeconds(turnLength);
+
+			move(playerOne, playerOne.GetComponent<Animus>().dir);
+			move(playerTwo, playerTwo.GetComponent<Animus>().dir);
+
+			yield return new WaitForSeconds(turnLength);
+		}
 	}
 }

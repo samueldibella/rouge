@@ -10,6 +10,7 @@ public class Enemy : MonoBehaviour {
 	GameObject [] players; 
 	bool running = false; 
 	public IEnumerator routine;
+	int i; 
 
 	void Start () {
 		manager = transform.parent.gameObject;
@@ -26,11 +27,10 @@ public class Enemy : MonoBehaviour {
 				{
 					if(hit.transform == next.transform && running == false)
 					{
-						print ("ahhhh");
 						StopCoroutine(routine);
 						StartCoroutine(SeenMove(next));
 						running = true; 
-						break; 
+						yield break; 
 					}
 				}
 			}
