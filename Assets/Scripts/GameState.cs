@@ -22,6 +22,8 @@ public class GameState : MonoBehaviour {
 	int playerY, playerX;
 	int dx, dy;
 
+
+	public static int highScore = 0; 
 	public int eatenEnemies = 0; 
 
 	//game state vars
@@ -218,9 +220,9 @@ public class GameState : MonoBehaviour {
 				Destroy(goalTile.GetComponent<TileStat>().occupant);
 				shiftPiece(piece, goalTile);
 				eatenEnemies++;
+				Generation.score++; 
 			}else {
 				if (piece.gameObject.tag == "Player" && piece.GetComponent<Animus>().moved) {
-					Debug.Log(dir);
 					StartCoroutine( LoseAnimation(piece) );
 				}
 			}
@@ -303,7 +305,7 @@ public class GameState : MonoBehaviour {
 		StopCoroutine( "Turns" );
 
 		notAllowed = true;
-
+		highScore = Generation.score; 
 		float timer = 1f;
 		Transform child;
 		//StartCoroutine(screen.GetComponent<ScreenControl>().LoseScreen() );

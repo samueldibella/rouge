@@ -11,6 +11,7 @@ public class Ending : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if(Input.GetKeyDown(KeyCode.Space)) {
+
 			Generation.maxEnemies = 5;
 			Application.LoadLevel("TitleScreen");
 		}
