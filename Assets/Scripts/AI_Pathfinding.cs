@@ -9,7 +9,7 @@ public class AI_Pathfinding : MonoBehaviour {
 	//map tiles
 	public enum Type
 	{
-		Floor = 1,
+		Floor = 1, 
 		Wall = 4,
 		Stone = 20,
 		Enemy = 50, 
@@ -24,12 +24,48 @@ public class AI_Pathfinding : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		current_position = new Vector2(GetComponent<Animus>().x, GetComponent<Animus>().y); 
 		StartCoroutine("Move");
-		current_position = new Vector2(Generation.StartPostion.x, Generation.StartPostion.y);
 	}
-	
-	// Update is called once per framels
 
+
+	void Movement() {
+		int otherQuad1;
+		int otherQuad2; 
+		//get location 
+		current_position = new Vector2(GetComponent<Animus>().x, GetComponent<Animus>().y); 
+		//find players location quadrent
+		int playeOneCurQuad = 1;
+		int playeTwoCurQuad = 2;
+
+		//pick the closest of the remaing two
+		int [] quads = new int[3]; quads[0] = 1;  quads[1] = 2; quads[2] = 3; quads[3] = 4; 
+		for(int i = 0; i < quads.Length; i++) {
+			if(quads[i] == playeOneCurQuad || quads[i] == playeTwoCurQuad){ quads[i] = 0; }
+		}
+
+		for(int i = 0; i < quads.Length; i++) {
+			if(quads[i] != 0 ){ 
+				//Pathfind
+
+			}
+		}
+
+	}
+
+
+	public void GetPointQuad(int num) {
+		if(num == 1) {
+
+		} else if (num == 2) {
+
+		} else if(num == 3) {
+
+		} else {
+
+		}
+	}
+	// Update is called once per framels
 	void Update () {
 
 	}

@@ -12,6 +12,7 @@ public class GameState : MonoBehaviour {
 	public GameObject playerOne;
 	public GameObject playerTwo;
 	public GameObject[,] tiles;
+	GameObject[] enemies;
 	public GameObject turnGUI;
 	public int mapHeight;
 	public int mapWidth;
@@ -20,6 +21,8 @@ public class GameState : MonoBehaviour {
 	int lightDeviation;
 	int playerY, playerX;
 	int dx, dy;
+
+	public int eatenEnemies = 0; 
 
 	//game state vars
 	public float turnLength;
@@ -74,7 +77,7 @@ public class GameState : MonoBehaviour {
 					tiles[j, i].GetComponent<TileStat>().x = i;
 					tiles[j, i].GetComponent<TileStat>().y = j;
 				} else if ((int)Generation.Map [j, i] == 50)  { //enemy
-					//player 1 start
+					//Enemy start
 					tiles[j, i] = Instantiate(tilePrefab, new Vector3(originTile.x + (i * tileScale), originTile.y + (j * tileScale), 0), Quaternion.identity) as GameObject;
 					tiles[j, i].GetComponent<TileStat>().occupant = Instantiate(enemyPrefab, new Vector3(originTile.x + (i * tileScale), originTile.y + (j * tileScale), 0), Quaternion.identity) as GameObject;
 					tiles[j, i].GetComponent<TileStat>().occupant.transform.parent = this.transform; 
@@ -92,7 +95,7 @@ public class GameState : MonoBehaviour {
 					tiles[j, i].transform.parent = this.transform;
 					tiles[j, i].GetComponent<TileStat>().x = i;
 					tiles[j, i].GetComponent<TileStat>().y = j;
-				} else if ((int)Generation.Map [j, i] == 200) {
+				} else if ((int)Generation.Map [j, i] == 200) { //player 2 start
 					tiles[j, i] = Instantiate(tilePrefab, new Vector3(originTile.x + (i * tileScale), originTile.y + (j * tileScale), 0), Quaternion.identity) as GameObject;
 					playerTwoStart = tiles[j, i];
 					tiles[j, i].transform.parent = this.transform;
@@ -117,19 +120,22 @@ public class GameState : MonoBehaviour {
 		playerTwo.GetComponent<Player>().setPlayerNum(2);
 		playerTwo.GetComponent<Animus>().setCoords(playerTwoStart.GetComponent<TileStat>().x, playerTwoStart.GetComponent<TileStat>().y);
 		playerTwo.GetComponent<Animus>().location = playerTwoStart;
-		playerTwo.GetComponent<Animus>().x = firstX + secondX;
-		playerTwo.GetComponent<Animus>().y = firstY + secondY;
 		playerTwoStart.GetComponent<TileStat>().occupied = true;
 		playerTwoStart.GetComponent<TileStat>().occupant = playerTwo;
 		playerTwo.transform.parent = this.transform;
 	}
 
 	void Start () {
+		enemies = GameObject.FindGameObjectsWithTag("Enemy");
 		StartCoroutine( Turns() );
 	}
 
 	void Update () {
-
+		if(eatenEnemies == Generation.maxEnemies) {
+			Generation.level++; 
+			Generation.maxEnemies = Generation.maxEnemies + (Generation.level/2);
+			Application.LoadLevel(Application.loadedLevel); 
+		}
 		for ( int y = playerOne.GetComponent<Animus>().y - lightRange; y < playerOne.GetComponent<Animus>().y + lightRange; y++) {
 			dy = y -  playerOne.GetComponent<Animus>().y;
 			dx = (int) Mathf.Sqrt(lightRange * lightRange - dy * dy );
@@ -179,22 +185,27 @@ public class GameState : MonoBehaviour {
 		switch(dir) {
 		case 'n':
 			if(goalY < mapHeight - 1) {
-					goalTile = tiles[goalY + 1, goalX];
+				goalTile = tiles[goalY + 1, goalX];
+				piece.GetComponent<Animus>().lastDir = dir; //for no reverse movement
+
 			}
 			break;
 		case 'w':
 			if(goalX > 0) {
 				goalTile = tiles[goalY, goalX - 1];
+				piece.GetComponent<Animus>().lastDir = dir;
 			}
 			break;
 		case 'e':
 			if(goalX < mapWidth - 1) {
 				goalTile = tiles[goalY, goalX + 1];
+				piece.GetComponent<Animus>().lastDir = dir;
 			}
 			break;
 		case 's':
 			if(goalY > 0) {
 				goalTile = tiles[goalY - 1, goalX];
+				piece.GetComponent<Animus>().lastDir = dir;
 			}
 			break;
 		default:
@@ -206,11 +217,12 @@ public class GameState : MonoBehaviour {
 				piece.GetComponent<Player>().grow(piece.GetComponent<Animus>().location);
 				Destroy(goalTile.GetComponent<TileStat>().occupant);
 				shiftPiece(piece, goalTile);
-			} else {
-					if (piece.gameObject.tag == "Player" && piece.GetComponent<Animus>().moved) {
-						Debug.Log(dir);
-						StartCoroutine( LoseAnimation(piece) );
-					}
+				eatenEnemies++;
+			}else {
+				if (piece.gameObject.tag == "Player" && piece.GetComponent<Animus>().moved) {
+					Debug.Log(dir);
+					StartCoroutine( LoseAnimation(piece) );
+				}
 			}
 		} else {
 			shiftPiece(piece, goalTile);
@@ -244,7 +256,7 @@ public class GameState : MonoBehaviour {
 		piece.GetComponent<Animus>().setCoords(newTile.GetComponent<TileStat>().x, newTile.GetComponent<TileStat>().y);
 
 		if(piece.gameObject.tag == "Player") {
-			if(piece.GetComponent<Player>(). length > 1) {
+			if(piece.GetComponent<Player>().length > 1) {
 				foreach (Transform child in piece.transform) {
 					if(child.gameObject.tag == "Segment") {
 						shiftPiece(child.gameObject, originalTile);
@@ -267,16 +279,7 @@ public class GameState : MonoBehaviour {
 	}
 
 	IEnumerator Turns() {
-		GameObject[] enemies;
-		while(!notAllowed) {
-
-			move(playerOne, playerOne.GetComponent<Animus>().dir);
-			move(playerTwo, playerTwo.GetComponent<Animus>().dir);
-
-			yield return new WaitForSeconds(turnLength);
-
-			enemies = GameObject.FindGameObjectsWithTag("Enemy");
-
+		while(true) {
 			//calc enemies move
 			if(enemies!= null) {
 				foreach (GameObject enemy in enemies) {
@@ -285,7 +288,12 @@ public class GameState : MonoBehaviour {
 					}
 				}
 			}
-
+			
+			yield return new WaitForSeconds(turnLength);
+			
+			move(playerOne, playerOne.GetComponent<Animus>().dir);
+			move(playerTwo, playerTwo.GetComponent<Animus>().dir);
+			
 			yield return new WaitForSeconds(turnLength);
 		}
 	}
@@ -303,8 +311,5 @@ public class GameState : MonoBehaviour {
 		player.GetComponent<Animus>().location.GetComponent<Renderer>().material = player.transform.GetChild(0).gameObject.GetComponent<Renderer>().material;
 		yield return new WaitForSeconds(1.5f);
 		Application.LoadLevel("Ending");
-
-
-
 	}
 }

@@ -25,24 +25,24 @@ public class Player : MonoBehaviour {
 	void Update () {
 		switch(playerNumber) {
 			case 1:
-			if(Input.GetKeyDown(KeyCode.W)) {
+			if(Input.GetKeyDown(KeyCode.W) && GetComponent<Animus>().lastDir != 's') {
 				this.GetComponent<Animus>().dir = 'n';
-			} else if (Input.GetKeyDown(KeyCode.A)) {
+			} else if (Input.GetKeyDown(KeyCode.A) && GetComponent<Animus>().lastDir != 'e') {
 				this.GetComponent<Animus>().dir = 'w';
-			} else if (Input.GetKeyDown(KeyCode.S)) {
+			} else if (Input.GetKeyDown(KeyCode.S) && GetComponent<Animus>().lastDir != 'n') {
 				this.GetComponent<Animus>().dir = 's';
-			} else if (Input.GetKeyDown(KeyCode.D)) {
+			} else if (Input.GetKeyDown(KeyCode.D) && GetComponent<Animus>().lastDir != 'w') {
 				this.GetComponent<Animus>().dir = 'e';
 			}
 				break;
 			case 2:
-			if(Input.GetKeyDown(KeyCode.I)) {
+			if(Input.GetKeyDown(KeyCode.I) && GetComponent<Animus>().lastDir != 's') {
 				this.GetComponent<Animus>().dir = 'n';
-			} else if (Input.GetKeyDown(KeyCode.J)) {
+			} else if (Input.GetKeyDown(KeyCode.J) && GetComponent<Animus>().lastDir != 'e') {
 				this.GetComponent<Animus>().dir = 'w';
-			} else if (Input.GetKeyDown(KeyCode.K)) {
+			} else if (Input.GetKeyDown(KeyCode.K) && GetComponent<Animus>().lastDir != 'n') {
 				this.GetComponent<Animus>().dir = 's';
-			} else if (Input.GetKeyDown(KeyCode.L)) {
+			} else if (Input.GetKeyDown(KeyCode.L) && GetComponent<Animus>().lastDir != 'w') {
 				this.GetComponent<Animus>().dir = 'e';
 			}
 				break;
@@ -76,12 +76,10 @@ public class Player : MonoBehaviour {
 		if(playerNumber == 2) {
 			segmentHolder.transform.GetChild(0).GetComponent<Renderer>().material.color = Color.black;
 		}
-
 		segmentHolder.GetComponent<Animus>().location = tile;
 		segmentHolder.GetComponent<Animus>().dir = GetComponent<Animus>().dir;
 		tile.GetComponent<TileStat>().occupied = true;
 		tile.GetComponent<TileStat>().occupant = segmentHolder;
-
 		segmentHolder.transform.parent = tail.transform;
 		tail = segmentHolder;
 		length++;

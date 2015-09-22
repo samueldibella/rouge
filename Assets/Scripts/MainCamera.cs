@@ -2,7 +2,7 @@
 using System.Collections;
 
 public class MainCamera : MonoBehaviour {
-
+	
 	GameObject p1;
 	GameObject p2;
 	Vector2 lerp;
@@ -22,11 +22,11 @@ public class MainCamera : MonoBehaviour {
 		minOrtho = 5;
 		maxOrtho = 10;
 	}
-
+	
 	// Update is called once per frame
 	void Update () {
 		lerp = Vector2.Lerp(p1.transform.position, p2.transform.position, .5f);
-
+		
 		transform.position = Vector3.Lerp (transform.position, new Vector3(lerp.x, lerp.y, -4f), 2f * Time.deltaTime);
 
 	}

@@ -31,11 +31,10 @@ public class Enemy : MonoBehaviour {
 						{
 							if(hit.transform == next.transform && running == false)
 							{
-								print("ahh");
 								StopCoroutine(routine);
 								StartCoroutine(SeenMove(next));
 								running = true; 
-								break; 
+								yield break; 
 							}
 						}
 					}
@@ -137,6 +136,7 @@ public class Enemy : MonoBehaviour {
 			yield return new WaitForSeconds (turnLength);
 		}
 		StartCoroutine("RndMove");
+		StartCoroutine("watch");
 		running = false; 
 	}
 }
