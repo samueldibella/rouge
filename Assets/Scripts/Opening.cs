@@ -11,8 +11,8 @@ public class Opening : MonoBehaviour {
 	void Update () {
 		if(Input.GetKeyDown(KeyCode.Space)) {
 			Generation.score = 0;
-			Generation.maxEnemies = 5; 
+			Generation.maxEnemies = 5;
 			Application.LoadLevel("The Beginning");
-		}
+		} 
 	}
 }

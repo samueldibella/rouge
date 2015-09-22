@@ -34,17 +34,25 @@ public class Player : MonoBehaviour {
 			} else if (Input.GetKeyDown(KeyCode.D) && GetComponent<Animus>().lastDir != 'w') {
 				this.GetComponent<Animus>().dir = 'e';
 			}
+
+			if(this.gameObject.GetComponent<Animus>().moved == true && manager.GetComponent<GameState>().playerTwo.GetComponent<Animus>().moved == false) {
+				manager.GetComponent<GameState>().playerTwo.GetComponent<Animus>().dir = this.GetComponent<Animus>().dir;
+			}
 				break;
 			case 2:
-			if(Input.GetKeyDown(KeyCode.I) && GetComponent<Animus>().lastDir != 's') {
-				this.GetComponent<Animus>().dir = 'n';
-			} else if (Input.GetKeyDown(KeyCode.J) && GetComponent<Animus>().lastDir != 'e') {
-				this.GetComponent<Animus>().dir = 'w';
-			} else if (Input.GetKeyDown(KeyCode.K) && GetComponent<Animus>().lastDir != 'n') {
-				this.GetComponent<Animus>().dir = 's';
-			} else if (Input.GetKeyDown(KeyCode.L) && GetComponent<Animus>().lastDir != 'w') {
-				this.GetComponent<Animus>().dir = 'e';
-			}
+				if(Input.GetKeyDown(KeyCode.I) && GetComponent<Animus>().lastDir != 's') {
+					this.GetComponent<Animus>().dir = 'n';
+				} else if (Input.GetKeyDown(KeyCode.J) && GetComponent<Animus>().lastDir != 'e') {
+					this.GetComponent<Animus>().dir = 'w';
+				} else if (Input.GetKeyDown(KeyCode.K) && GetComponent<Animus>().lastDir != 'n') {
+					this.GetComponent<Animus>().dir = 's';
+				} else if (Input.GetKeyDown(KeyCode.L) && GetComponent<Animus>().lastDir != 'w') {
+					this.GetComponent<Animus>().dir = 'e';
+				}
+
+				if(this.gameObject.GetComponent<Animus>().moved == true && 			manager.GetComponent<GameState>().playerOne.GetComponent<Animus>().moved == false) {
+				manager.GetComponent<GameState>().playerOne.GetComponent<Animus>().dir = this.GetComponent<Animus>().dir;
+				}
 				break;
 		}
 /*

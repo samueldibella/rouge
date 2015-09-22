@@ -22,9 +22,8 @@ public class GameState : MonoBehaviour {
 	int playerY, playerX;
 	int dx, dy;
 
-
-	public static int highScore = 0; 
-	public int eatenEnemies = 0; 
+	public static int highScore = 0;
+	public int eatenEnemies = 0;
 
 	//game state vars
 	public float turnLength;
@@ -82,7 +81,7 @@ public class GameState : MonoBehaviour {
 					//Enemy start
 					tiles[j, i] = Instantiate(tilePrefab, new Vector3(originTile.x + (i * tileScale), originTile.y + (j * tileScale), 0), Quaternion.identity) as GameObject;
 					tiles[j, i].GetComponent<TileStat>().occupant = Instantiate(enemyPrefab, new Vector3(originTile.x + (i * tileScale), originTile.y + (j * tileScale), 0), Quaternion.identity) as GameObject;
-					tiles[j, i].GetComponent<TileStat>().occupant.transform.parent = this.transform; 
+					tiles[j, i].GetComponent<TileStat>().occupant.transform.parent = this.transform;
 					tiles[j, i].GetComponent<TileStat>().occupant.GetComponent<Animus>().x = i;
 					tiles[j, i].GetComponent<TileStat>().occupant.GetComponent<Animus>().y = j;
 					tiles[j, i].GetComponent<TileStat>().occupant.GetComponent<Animus>().location = tiles[j,i];
@@ -134,9 +133,9 @@ public class GameState : MonoBehaviour {
 
 	void Update () {
 		if(eatenEnemies == Generation.maxEnemies) {
-			Generation.level++; 
+			Generation.level++;
 			Generation.maxEnemies = Generation.maxEnemies + (Generation.level/2);
-			Application.LoadLevel(Application.loadedLevel); 
+			Application.LoadLevel(Application.loadedLevel);
 		}
 		for ( int y = playerOne.GetComponent<Animus>().y - lightRange; y < playerOne.GetComponent<Animus>().y + lightRange; y++) {
 			dy = y -  playerOne.GetComponent<Animus>().y;
@@ -220,7 +219,7 @@ public class GameState : MonoBehaviour {
 				Destroy(goalTile.GetComponent<TileStat>().occupant);
 				shiftPiece(piece, goalTile);
 				eatenEnemies++;
-				Generation.score++; 
+				Generation.score++;
 			}else {
 				if (piece.gameObject.tag == "Player" && piece.GetComponent<Animus>().moved) {
 					StartCoroutine( LoseAnimation(piece) );
@@ -267,7 +266,6 @@ public class GameState : MonoBehaviour {
 			}
 
 			StartCoroutine ( piece.GetComponent<Animus>().movementAnimation() );
-			Camera.main.transform.GetChild(0).GetComponent<DominoSound>().moveNoise();
 		}
 
 		if (piece.gameObject.tag == "Segment") {
@@ -277,11 +275,10 @@ public class GameState : MonoBehaviour {
 		}
 
 		piece.GetComponent<Animus>().moved = true;
-			//StartCoroutine ( piece.GetComponent<Animus>().movementAnimation() );
 	}
 
 	IEnumerator Turns() {
-		while(true) {
+		while(!notAllowed) {
 			//calc enemies move
 			if(enemies!= null) {
 				foreach (GameObject enemy in enemies) {
@@ -290,12 +287,13 @@ public class GameState : MonoBehaviour {
 					}
 				}
 			}
-			
+
 			yield return new WaitForSeconds(turnLength);
-			
+
 			move(playerOne, playerOne.GetComponent<Animus>().dir);
 			move(playerTwo, playerTwo.GetComponent<Animus>().dir);
-			
+			Camera.main.transform.GetChild(0).GetComponent<DominoSound>().moveNoise();
+
 			yield return new WaitForSeconds(turnLength);
 		}
 	}
@@ -305,11 +303,8 @@ public class GameState : MonoBehaviour {
 		StopCoroutine( "Turns" );
 
 		notAllowed = true;
-		highScore = Generation.score; 
-		float timer = 1f;
-		Transform child;
-		//StartCoroutine(screen.GetComponent<ScreenControl>().LoseScreen() );
-		//Blow Up snake
+		highScore = Generation.score;
+
 		player.GetComponent<Animus>().location.GetComponent<Renderer>().material = player.transform.GetChild(0).gameObject.GetComponent<Renderer>().material;
 		yield return new WaitForSeconds(1.5f);
 		Application.LoadLevel("Ending");

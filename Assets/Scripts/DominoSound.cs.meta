@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 7aca88905a7ce544bbb2006e9c6b510a
-timeCreated: 1442782118
+timeCreated: 1442897669
 licenseType: Free
 MonoImporter:
   serializedVersion: 2
@@ -10,6 +10,7 @@ MonoImporter:
   - clip3: {fileID: 8300000, guid: 848185db583820d48b7d29e599d5c345, type: 3}
   - clip4: {fileID: 8300000, guid: 4bb2648fcecb060419dda3a46ccc0600, type: 3}
   - clip5: {fileID: 8300000, guid: d757c9fad7dd8a849a5a126bacf65c71, type: 3}
+  - death: {fileID: 8300000, guid: 755b1e2c26e7a9d44ab6ea5718d755f2, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

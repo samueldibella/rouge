@@ -17,8 +17,7 @@ public class DominoSound : MonoBehaviour {
 	}
 
 	public void deathNoise() {
-		audio.clip = death;
-		audio.Play();
+		AudioSource.PlayClipAtPoint(death, Camera.main.transform.position);
 	}
 
 	public void captureNoise() {

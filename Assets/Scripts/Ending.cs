@@ -13,6 +13,7 @@ public class Ending : MonoBehaviour {
 		if(Input.GetKeyDown(KeyCode.Space)) {
 
 			Generation.maxEnemies = 5;
+			Generation.score = 0;
 			Application.LoadLevel("TitleScreen");
 		}
 	}
